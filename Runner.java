@@ -1,3 +1,5 @@
-public class Runner {
-    
+public class Runner{
+    public static void main(){
+        new Window();
+    }
 }
