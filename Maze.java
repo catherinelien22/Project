@@ -66,5 +66,68 @@ public class Maze{
             }
         }
     }    
+    //get rid of the dead ends
+    public void breakWalls() {
+        for (int r = 0; r < grid.length; r++) {
+            for (int c = 0; c < grid[0].length; c++) {
+                
+                if (grid[r][c].obstacle == false) {// if current isn't a wall
+                    //check if has dead ends
+                    //up, left, right blocked
+                    if (grid[r-1][c].obstacle && grid[r][c-1].obstacle && grid[r][c+1].obstacle) {
+                        if (r-1 != 0) {// break top one
+                            grid[r-1][c].obstacle = false;
+                        }
+                        //break right one
+                        else if (c!= grid[0].length-1) {
+                            grid[r][c+1].obstacle = false;
+                        }
+                        else { // break left one
+                            grid[r][c-1].obstacle = false;
+                        }
+                    }
+                    //up, left, down blocked
+                    if (grid[r-1][c].obstacle && grid[r][c-1].obstacle && grid[r+1][c].obstacle) {
+                        if (c-1!= 0) { //break left
+                            grid[r][c-1].obstacle = false;
+                        }
+                        //break up
+                        else if (r-1 != 0) {
+                            grid[r-1][c].obstacle = false;
+                        }
+                        else { // break down
+                            grid[r+1][c].obstacle = false;
+                        }
+                    }
+                    //up, right, down blocked
+                    if (grid[r-1][c].obstacle && grid[r][c+1].obstacle && grid[r+1][c].obstacle) {
+                        if (c+1 != grid[0].length-1) {//break right
+                            grid[r][c+1].obstacle = false;
+                        }
+                        
+                        else if (r+1 != grid.length-1) {//break down
+                            grid[r+1][c].obstacle = false;
+                        }
+                        else { // break up
+                            grid[r-1][c].obstacle = false;
+                        }
+                    }
+                    //left, right, down blocked
+                    if (grid[r][c-1].obstacle && grid[r][c+1].obstacle && grid[r+1][c].obstacle) {
+                        if (c-1 != 0) {//break left
+                            grid[r][c-1].obstacle = false;
+                        }
+                        
+                        else if (c+1 != grid[0].length-1) {//break right
+                            grid[r][c+1].obstacle = false;
+                        }
+                        else {//break down
+                            grid[r+1][c].obstacle = false;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
