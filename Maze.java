@@ -2,18 +2,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.ArrayList;
 public class Maze{
-    public int[][] grid;
+    public Node[][] grid;
     private int width,height;
     public Maze(int r, int c){
         if (r%2 == 0 || c % 2 == 0)
             return;
         else{
-            grid = new int[r][c];
+            grid = new Node[r][c];
             width = c; height = r;
                 //set everything to wall
             for (int i = 0;  i< r; i++)
                 for (int j = 0; j < c; j++)
-                    grid[i][j] = 1;
+                    grid[i][j].obstacle = true;
             recursiveDFSGenerate(1,1);
         } 
     }
@@ -27,43 +27,39 @@ public class Maze{
         // Examine each direction
         for (int i = 0; i < randomDirections.size(); i++) {
             switch(randomDirections.get(i)){
-                case 1: // Up
-                //?Whether 2 cells up is out or not
+                case 1:
                 if (r - 2 <= 0)
                     continue;
-                if (grid[r - 2][c] != 0) {
-                    grid[r-2][c] = 0;
-                    grid[r-1][c] = 0;
+                if (!grid[r - 2][c].obstacle) {
+                    grid[r-2][c].obstacle = false;
+                    grid[r-1][c].obstacle = false;
                     recursiveDFSGenerate(r - 2, c);
                 }
                 break;
-                case 2: // Right
-                // Whether 2 cells to the right is out or not
+                case 2:
                 if (c + 2 >= width - 1)
                     continue;
-                if (grid[r][c + 2] != 0) {
-                    grid[r][c + 2] = 0;
-                    grid[r][c + 1] = 0;
+                if (!grid[r][c + 2].obstacle) {
+                    grid[r][c + 2].obstacle = false;
+                    grid[r][c + 1].obstacle = false;
                     recursiveDFSGenerate(r, c + 2);
                 }
                 break;
-                case 3: // Down
-                // Whether 2 cells down is out or not
+                case 3:
                 if (r + 2 >= height - 1)
                     continue;
-                if (grid[r + 2][c] != 0) {
-                    grid[r+2][c] = 0;
-                    grid[r+1][c] = 0;
+                if (!grid[r + 2][c].obstacle) {
+                    grid[r+2][c].obstacle = false;
+                    grid[r+1][c].obstacle = false;
                     recursiveDFSGenerate(r + 2, c);
                 }
                 break;
-                case 4: // Left
-                // Whether 2 cells to the left is out or not
+                case 4:
                 if (c - 2 <= 0)
                     continue;
-                if (grid[r][c - 2] != 0) {
-                    grid[r][c - 2] = 0;
-                    grid[r][c - 1] = 0;
+                if (!grid[r][c - 2].obstacle) {
+                    grid[r][c - 2].obstacle = false;
+                    grid[r][c - 1].obstacle = false;
                     recursiveDFSGenerate(r, c - 2);
                 }
                 break;
