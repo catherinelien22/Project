@@ -1,16 +1,21 @@
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.ArrayList;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import javax.swing.JPanel;
+import javax.swing.JFrame;
 public class Maze{
     public Node[][] grid;
-    private int width,height;
+    public int width,height;
     public Maze(int r, int c){
         if (r%2 == 0 || c % 2 == 0)
             return;
         else{
             grid = new Node[r][c];
             width = c; height = r;
-                //set everything to wall
+            //set everything to wall
             for (int i = 0;  i< r; i++)
                 for (int j = 0; j < c; j++){
                     grid[i][j] = new Node(i,j);
@@ -25,14 +30,14 @@ public class Maze{
         for (int i = 1; i <= 4; i++)
             randomDirections.add(i);
         Collections.shuffle(randomDirections);
-        
+
         // Examine each direction
         for (int i = 0; i < randomDirections.size(); i++) {
             switch(randomDirections.get(i)){
                 case 1:
                 if (r - 2 <= 0)
                     continue;
-                if (!grid[r - 2][c].obstacle) {
+                if (grid[r - 2][c].obstacle) {
                     grid[r-2][c].obstacle = false;
                     grid[r-1][c].obstacle = false;
                     recursiveDFSGenerate(r - 2, c);
@@ -41,7 +46,7 @@ public class Maze{
                 case 2:
                 if (c + 2 >= width - 1)
                     continue;
-                if (!grid[r][c + 2].obstacle) {
+                if (grid[r][c + 2].obstacle) {
                     grid[r][c + 2].obstacle = false;
                     grid[r][c + 1].obstacle = false;
                     recursiveDFSGenerate(r, c + 2);
@@ -50,7 +55,7 @@ public class Maze{
                 case 3:
                 if (r + 2 >= height - 1)
                     continue;
-                if (!grid[r + 2][c].obstacle) {
+                if (grid[r + 2][c].obstacle) {
                     grid[r+2][c].obstacle = false;
                     grid[r+1][c].obstacle = false;
                     recursiveDFSGenerate(r + 2, c);
@@ -59,7 +64,7 @@ public class Maze{
                 case 4:
                 if (c - 2 <= 0)
                     continue;
-                if (!grid[r][c - 2].obstacle) {
+                if (grid[r][c - 2].obstacle) {
                     grid[r][c - 2].obstacle = false;
                     grid[r][c - 1].obstacle = false;
                     recursiveDFSGenerate(r, c - 2);
@@ -69,10 +74,10 @@ public class Maze{
         }
     }    
     //get rid of the dead ends
-    public void breakWalls() {
+    public void removeDeadEnds() {
         for (int r = 0; r < grid.length; r++) {
             for (int c = 0; c < grid[0].length; c++) {
-                
+
                 if (grid[r][c].obstacle == false) {// if current isn't a wall
                     //check if has dead ends
                     //up, left, right blocked
@@ -106,7 +111,7 @@ public class Maze{
                         if (c+1 != grid[0].length-1) {//break right
                             grid[r][c+1].obstacle = false;
                         }
-                        
+
                         else if (r+1 != grid.length-1) {//break down
                             grid[r+1][c].obstacle = false;
                         }
@@ -119,7 +124,7 @@ public class Maze{
                         if (c-1 != 0) {//break left
                             grid[r][c-1].obstacle = false;
                         }
-                        
+
                         else if (c+1 != grid[0].length-1) {//break right
                             grid[r][c+1].obstacle = false;
                         }
@@ -128,6 +133,40 @@ public class Maze{
                         }
                     }
                 }
+            }
+        }
+    }
+
+    //just for debugging don't use it lmao
+    public static void main (String[] args){
+        Maze stuff = new Maze(17,17);
+        StdDraw.setCanvasSize(700,700);
+        StdDraw.setYscale(0,700);
+        StdDraw.setXscale(0,700);
+        for (int i = 0; i < stuff.height; i++){
+            for (int j = 0; j < stuff.width; j++){
+                if (stuff.grid[i][j].obstacle){
+                    StdDraw.setPenColor(StdDraw.BLACK);
+                }else{
+                    StdDraw.setPenColor(StdDraw.WHITE);
+                }
+                StdDraw.filledRectangle(i*20+10,j*20+10,10,10);
+                StdDraw.setPenColor(StdDraw.BLACK);
+                StdDraw.rectangle(i*20+10,j*20+10,10,10);
+            }
+        }
+        stuff.removeDeadEnds();
+        
+        for (int i = 0; i < stuff.height; i++){
+            for (int j = 0; j < stuff.width; j++){
+                if (stuff.grid[i][j].obstacle){
+                    StdDraw.setPenColor(StdDraw.BLACK);
+                }else{
+                    StdDraw.setPenColor(StdDraw.WHITE);
+                }
+                StdDraw.filledRectangle(i*20+10,j*20+10,10,10);
+                StdDraw.setPenColor(StdDraw.BLACK);
+                StdDraw.rectangle(i*20+10,j*20+10,10,10);
             }
         }
     }

@@ -34,9 +34,9 @@ public class SearchAgent{
                 list = backTrack(q, list);
                 list.add(0, q);
                 Collections.reverse(list);
-                for (int i = 0; i < list.size(); i++) {
+                /*for (int i = 0; i < list.size(); i++) {
                     list.get(i).solution = true;
-                }
+                }*/
                 return;
             }
             visited.add(q);
@@ -65,27 +65,19 @@ public class SearchAgent{
                             child.f = child.h;
                             queue.add(child);
                             child.parent = q;
-                            child.fringe = true;
                         }
                     }
                 }
             }
-
-            showNoSolutionDialog();
-            running = false;
-            timer.start();
+            return;
         }
     }
 
     //does various type of reset. references to the reset defined in the class "Node"
-    public void reset(String type) {
-        if (type.equals("all")) {
-            start = null;
-            end = null;
-        }
+    public void reset(Maze world) {
         for (int i = 0; i < world.grid.length; i++)
             for (int j = 0; j < world.grid[0].length; j++)
-                world.grid[i][j].reset(type);
+                world.grid[i][j].reset();
     }
 
     //backtrack for the solution
