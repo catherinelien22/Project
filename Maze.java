@@ -12,8 +12,10 @@ public class Maze{
             width = c; height = r;
                 //set everything to wall
             for (int i = 0;  i< r; i++)
-                for (int j = 0; j < c; j++)
+                for (int j = 0; j < c; j++){
+                    grid[i][j] = new Node(i,j);
                     grid[i][j].obstacle = true;
+                }
             recursiveDFSGenerate(1,1);
         } 
     }

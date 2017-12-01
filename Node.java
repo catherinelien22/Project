@@ -1,25 +1,19 @@
 public class Node implements Comparable<Node> {
 	public int c, r;
 	//for searching and fringe 
-	public double f, h, g;
+	public double f, h;
 	//for backtrack
 	public Node parent;
 	//for drawing and searching
-	public boolean obstacle, start, end, fringe, visited, solution;
+	public boolean obstacle;
 
 	public Node(int a, int b) {
-		c = a;
-		r = b;
+		r = a;
+		c = b;
 		parent = null;
 		obstacle = false;
-		start = false;
-		end = false;
-		fringe = false;
-		visited = false;
-		solution = false;
 		f = 0;
 		h = 0;
-		g = 0;
 	}
 
 	public double getDist(Node stuff) {
@@ -30,20 +24,9 @@ public class Node implements Comparable<Node> {
 		return (int) ((this.f - stuff.f) * 100);
 	}
 
-	public void reset(String type) {
+	public void reset() {
 		parent = null;
 		f = 0;
 		h = 0;
-		g = 0;
-		fringe = false;
-		visited = false;
-		solution = false;
-		if (type.equals("all")) {
-			obstacle = false;
-			start = false;
-			end = false;
-		}else if (type.equals("obstacle")) {
-			obstacle = false;
-		}
 	}
 }
