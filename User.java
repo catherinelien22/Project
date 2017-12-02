@@ -1,7 +1,7 @@
 
 public class User
 {
-    int points, life;
+    int points, life, r, c, orientation;
     User() {
         
     }

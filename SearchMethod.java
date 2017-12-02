@@ -1,27 +1,10 @@
 import java.util.PriorityQueue;
-import javax.swing.Timer;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class SearchAgent{
-    public SearchAgent() {
-    }
+public class SearchMethod{
     //does the searching and the animation
-    public void greedySearch(Node start, Node end, Maze world) {
+    public static Node greedySearch(Node start, Node end, Maze world) {
         PriorityQueue<Node> queue = new PriorityQueue<Node>();
         ArrayList<Node> visited = new ArrayList<Node>();
         start.h = start.getDist(end);
@@ -34,10 +17,11 @@ public class SearchAgent{
                 list = backTrack(q, list);
                 list.add(0, q);
                 Collections.reverse(list);
-                /*for (int i = 0; i < list.size(); i++) {
-                    list.get(i).solution = true;
-                }*/
-                return;
+                reset(world);
+                if (list.size() > 1)
+                    return list.get(1);
+                else
+                    return list.get(0);
             }
             visited.add(q);
             // all the neighbors
@@ -69,19 +53,19 @@ public class SearchAgent{
                     }
                 }
             }
-            return;
         }
+        return null;
     }
 
     //does various type of reset. references to the reset defined in the class "Node"
-    public void reset(Maze world) {
+    public static void reset(Maze world) {
         for (int i = 0; i < world.grid.length; i++)
             for (int j = 0; j < world.grid[0].length; j++)
                 world.grid[i][j].reset();
     }
 
     //backtrack for the solution
-    public ArrayList backTrack(Node child, ArrayList list) {
+    public static ArrayList backTrack(Node child, ArrayList list) {
         if (child.parent == null) {
             return list;
         } else {
