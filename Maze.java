@@ -21,6 +21,7 @@ public class Maze{
                     grid[i][j] = new Node(i,j);
                     grid[i][j].obstacle = true;
                 }
+            grid[1][1].obstacle = false;
             recursiveDFSGenerate(1,1);
         } 
     }
@@ -75,66 +76,75 @@ public class Maze{
     }    
     //get rid of the dead ends
     public void removeDeadEnds() {
-        for (int r = 0; r < grid.length; r++) {
-            for (int c = 0; c < grid[0].length; c++) {
-
-                if (grid[r][c].obstacle == false) {// if current isn't a wall
+        for (int r = 1; r < grid.length-1; r++) {
+            for (int c = 1; c < grid[0].length-1; c++) {
+                if (!grid[r][c].obstacle) {// if current isn't a wall
                     //check if has dead ends
-                    //up, left, right blocked
-                    if (grid[r-1][c].obstacle && grid[r][c-1].obstacle && grid[r][c+1].obstacle) {
-                        if (r-1 != 0) {// break top one
-                            grid[r-1][c].obstacle = false;
+                    boolean[] status = {grid[r+1][c].obstacle,grid[r][c+1].obstacle,grid[r-1][c].obstacle,grid[r][c-1].obstacle};
+                    int blockedSides = countWalls(status);
+                    if (blockedSides != 3)
+                        continue;
+                    else{
+                        boolean removedWall = false;
+                        while(!removedWall){
+                            switch((int)(Math.random()*4)+1){
+                                case 1:
+                                if (outOfBound(r+1,true) || !grid[r+1][c].obstacle)
+                                    continue;
+                                else{
+                                    grid[r+1][c].obstacle = false;
+                                    removedWall = true;
+                                    continue;
+                                }
+                                case 2:
+                                if (outOfBound(c+1,false) || !grid[r][c+1].obstacle)
+                                    continue;
+                                else{
+                                    grid[r][c+1].obstacle = false;
+                                    removedWall = true;
+                                    continue;
+                                }
+                                case 3:
+                                if (outOfBound(r-1,true) || !grid[r-1][c].obstacle)
+                                    continue;
+                                else{
+                                    grid[r-1][c].obstacle = false;
+                                    removedWall = true;
+                                    continue;
+                                }
+                                case 4:
+                                if (outOfBound(c-1,false) || !grid[r][c-1].obstacle)
+                                    continue;
+                                else{
+                                    grid[r][c-1].obstacle = false;
+                                    removedWall = true;
+                                    continue;
+                                }
+                            }
                         }
-                        //break right one
-                        else if (c!= grid[0].length-1) {
-                            grid[r][c+1].obstacle = false;
-                        }
-                        else { // break left one
-                            grid[r][c-1].obstacle = false;
-                        }
-                    }
-                    //up, left, down blocked
-                    if (grid[r-1][c].obstacle && grid[r][c-1].obstacle && grid[r+1][c].obstacle) {
-                        if (c-1!= 0) { //break left
-                            grid[r][c-1].obstacle = false;
-                        }
-                        //break up
-                        else if (r-1 != 0) {
-                            grid[r-1][c].obstacle = false;
-                        }
-                        else { // break down
-                            grid[r+1][c].obstacle = false;
-                        }
-                    }
-                    //up, right, down blocked
-                    if (grid[r-1][c].obstacle && grid[r][c+1].obstacle && grid[r+1][c].obstacle) {
-                        if (c+1 != grid[0].length-1) {//break right
-                            grid[r][c+1].obstacle = false;
-                        }
-
-                        else if (r+1 != grid.length-1) {//break down
-                            grid[r+1][c].obstacle = false;
-                        }
-                        else { // break up
-                            grid[r-1][c].obstacle = false;
-                        }
-                    }
-                    //left, right, down blocked
-                    if (grid[r][c-1].obstacle && grid[r][c+1].obstacle && grid[r+1][c].obstacle) {
-                        if (c-1 != 0) {//break left
-                            grid[r][c-1].obstacle = false;
-                        }
-
-                        else if (c+1 != grid[0].length-1) {//break right
-                            grid[r][c+1].obstacle = false;
-                        }
-                        else {//break down
-                            grid[r+1][c].obstacle = false;
-                        }
-                    }
+                    }   
                 }
             }
         }
+    }
+
+    public int countWalls(boolean[] stuff){
+        int ans = 0;
+        for (int i = 0; i < stuff.length; i++)
+            if (stuff[i])
+                ans++;
+        return ans;
+    }
+
+    public boolean outOfBound(int i, boolean r){
+        if (r){
+            if (i <height-1 && i >0)
+                return false;
+        }else{
+            if (i < width-1 && i > 0)
+                return false;
+        }
+        return true;
     }
 
     //just for debugging don't use it lmao
@@ -150,13 +160,14 @@ public class Maze{
                 }else{
                     StdDraw.setPenColor(StdDraw.WHITE);
                 }
-                StdDraw.filledRectangle(i*20+10,j*20+10,10,10);
+                StdDraw.filledRectangle(j*20+10,i*20+10,10,10);
                 StdDraw.setPenColor(StdDraw.BLACK);
-                StdDraw.rectangle(i*20+10,j*20+10,10,10);
+                StdDraw.rectangle(j*20+10,i*20+10,10,10);
             }
         }
+
         stuff.removeDeadEnds();
-        
+
         for (int i = 0; i < stuff.height; i++){
             for (int j = 0; j < stuff.width; j++){
                 if (stuff.grid[i][j].obstacle){
@@ -164,9 +175,9 @@ public class Maze{
                 }else{
                     StdDraw.setPenColor(StdDraw.WHITE);
                 }
-                StdDraw.filledRectangle(i*20+10,j*20+10,10,10);
+                StdDraw.filledRectangle(j*20+350,i*20+350,10,10);
                 StdDraw.setPenColor(StdDraw.BLACK);
-                StdDraw.rectangle(i*20+10,j*20+10,10,10);
+                StdDraw.rectangle(j*20+350,i*20+350,10,10);
             }
         }
     }
