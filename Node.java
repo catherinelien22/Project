@@ -5,13 +5,15 @@ public class Node implements Comparable<Node> {
 	//for backtrack
 	public Node parent;
 	//for drawing and searching
-	public boolean obstacle;
+	public boolean obstacle,point,bigPoint;
 
 	public Node(int a, int b) {
 		r = a;
 		c = b;
 		parent = null;
 		obstacle = false;
+		point = false;
+		bigPoint = false;
 		f = 0;
 		h = 0;
 	}

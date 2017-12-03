@@ -23,6 +23,8 @@ public class Maze{
                 }
             grid[1][1].obstacle = false;
             recursiveDFSGenerate(1,1);
+            removeDeadEnds();
+            addPoints();
         } 
     }
 
@@ -180,6 +182,12 @@ public class Maze{
                 StdDraw.rectangle(j*20+350,i*20+350,10,10);
             }
         }
+    }
+    
+    public void addPoints(){
+        //loop through the entire Maze
+        //place specific amount of "Big Points"
+        //the rest are points
     }
 }
 
