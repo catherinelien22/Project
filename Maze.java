@@ -6,10 +6,11 @@ import java.awt.Color;
 import java.awt.Graphics;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
-public class Maze{
+public class Maze extends JPanel {
     public Node[][] grid;
     public int width,height;
     public Maze(int r, int c){
+        
         if (r%2 == 0 || c % 2 == 0)
             return;
         else{
@@ -183,11 +184,43 @@ public class Maze{
             }
         }
     }
-    
+
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Maze stuff = new Maze(width,height);
+        for (int i = 0; i < stuff.height; i++){
+            for (int j = 0; j < stuff.width; j++){
+                if (stuff.grid[i][j].obstacle){
+                    g.setColor(Color.BLACK);
+                }else{
+                    g.setColor(Color.WHITE);
+                }
+                g.fillRect(j*20+10,i*20+10,20,20);
+                g.setColor(Color.BLACK);
+                g.drawRect(j*20+10,i*20+10,20,20);
+            }
+        }
+
+        stuff.removeDeadEnds();
+
+        for (int i = 0; i < stuff.height; i++){
+            for (int j = 0; j < stuff.width; j++){
+                if (stuff.grid[i][j].obstacle){
+                    g.setColor(Color.BLACK);
+                }else{
+                    g.setColor(Color.WHITE);
+                }
+                g.fillRect(j*20+350,i*20+350,20,20);
+                g.setColor(Color.BLACK);
+                g.drawRect(j*20+350,i*20+350,20,20);
+            }
+        }
+    }
+
     public void addPoints(){
         //loop through the entire Maze
         //place specific amount of "Big Points"
-        //the rest are points
+        //the rest are points   
     }
 }
 
