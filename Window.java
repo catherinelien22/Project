@@ -11,7 +11,7 @@ public class Window extends JFrame
        setResizable(false);
        setVisible(true);
        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-       add(new Maze(17, 17));
+       add(new Maze(17, 17)); 
        setSize(new Dimension(WIDTH,HEIGHT));
        
    }
