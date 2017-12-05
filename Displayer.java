@@ -40,12 +40,12 @@ public class Displayer extends JPanel implements KeyListener
             ghostImages[3] = ImageIO.read(new File("clyde file.png"));
         } 
         catch(IOException e) {System.out.println("ERROR");};
-                 updater = new Timer(40, new ActionListener() {
-                     public void actionPerformed(ActionEvent evt) {
-                         repaint();
-                     }
-                 });
-                 updater.start();
+        updater = new Timer(40, new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                repaint();
+            }
+        });
+        updater.start();
     }
 
     public void paintComponent(Graphics g){
@@ -209,9 +209,8 @@ public class Displayer extends JPanel implements KeyListener
     }
 
     public void ghostUpdate(){
-        /*for (int i = 0; i < ghosts.length; i++)
-            ghosts[i].performSimpleAgentTask();*/
-        ghosts[0].performSimpleAgentTask();
+        for (int i = 0; i < ghosts.length; i++) 
+            ghosts[i].performSimpleAgentTask(); 
     }
 
     public void updateTimerTask(String type){

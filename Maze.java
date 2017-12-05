@@ -105,7 +105,7 @@ public class Maze extends JPanel {
                             switch((int)(Math.random()*4)+1){
                                 case 1:
                                 if (outOfBound(r+1,true) || (grid[r+1][c].obstacle && grid[r+1][c].unbreakable) || 
-                                    !grid[r+1][c].obstacle)
+                                !grid[r+1][c].obstacle)
                                     continue;
                                 else{
                                     grid[r+1][c].obstacle = false;
@@ -114,7 +114,7 @@ public class Maze extends JPanel {
                                 }
                                 case 2:
                                 if (outOfBound(c+1,false) || (grid[r][c+1].unbreakable&& grid[r][c+1].obstacle )|| 
-                                    !grid[r][c+1].obstacle)
+                                !grid[r][c+1].obstacle)
                                     continue;
                                 else{
                                     grid[r][c+1].obstacle = false;
@@ -123,7 +123,7 @@ public class Maze extends JPanel {
                                 }
                                 case 3:
                                 if (outOfBound(r-1,true) || (grid[r-1][c].unbreakable && grid[r-1][c].obstacle) || 
-                                    !grid[r-1][c].obstacle)
+                                !grid[r-1][c].obstacle)
                                     continue;
                                 else{
                                     grid[r-1][c].obstacle = false;
@@ -132,7 +132,7 @@ public class Maze extends JPanel {
                                 }
                                 case 4:
                                 if (outOfBound(c-1,false) || (grid[r][c-1].unbreakable&& grid[r][c-1].obstacle )|| 
-                                    !grid[r][c-1].obstacle)
+                                !grid[r][c-1].obstacle)
                                     continue;
                                 else{
                                     grid[r][c-1].obstacle = false;
@@ -174,7 +174,7 @@ public class Maze extends JPanel {
         StdDraw.setXscale(0,700);
         drawMap(stuff);
     }
-    
+
     public static void drawMap(Maze stuff){
         for (int i = 0; i < stuff.height; i++){
             for (int j = 0; j < stuff.width; j++){
@@ -230,7 +230,7 @@ public class Maze extends JPanel {
             }
         }
     }
-    
+
     public static boolean isTurn(boolean[] stuff){
         if (countWalls(stuff) != 2)
             return false;
@@ -245,15 +245,32 @@ public class Maze extends JPanel {
         //place specific amount of "Big Points"
         //the rest are points
         ArrayList <Node> intersections = new ArrayList<Node>();
-        for (int r = 1; r < grid.length-1; r++ ) {
-            for (int c = 1; c < grid[0].length-1; c++) {
-                if (grid[r][c].obstacle)
-                    continue;
-                boolean[] surrounding = {grid[r+1][c].obstacle,grid[r][c+1].obstacle,grid[r-1][c].obstacle,grid[r][c-1].obstacle};
-                if (isTurn(surrounding))
+        for (int r = 1; r < grid.length - 1; r++ ) {
+            for (int c = 1; c < grid[0].length - 1; c++) {
+                //up, right
+                if (grid[r-1][c].obstacle == false && grid[r][c+1].obstacle == false) {
                     intersections.add(grid[r][c]);
+                    continue;
+                }
+
+                //up, left
+                if (grid[r-1][c].obstacle == false && grid[r][c-1].obstacle == false) {
+                    intersections.add(grid[r][c]);
+                    continue;
+                }
+
+                //down left
+                if (grid[r+1][c].obstacle == false && grid[r][c-1].obstacle == false) {
+                    intersections.add(grid[r][c]);
+                    continue;                  
+                }
+
+                //down right
+                if (grid[r+1][c].obstacle == false && grid[r][c+1].obstacle == false) {
+                    intersections.add(grid[r][c]);
+                }
             }
-        }        
+        }
         int num = 0;
         int rand = 0;
         while (num != 5) {
@@ -261,7 +278,8 @@ public class Maze extends JPanel {
             intersections.get(rand).bigPoint = true;
             intersections.remove(rand);
             num++;
-        }        
+        }
+
         for (int r = 0; r < grid.length; r++) {
             for (int c = 0; c < grid[0].length; c++) {
                 if (grid[r][c].obstacle == false && grid[r][c].bigPoint == false) {
