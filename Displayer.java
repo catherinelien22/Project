@@ -23,6 +23,7 @@ public class Displayer extends JPanel implements KeyListener
     Ghost blinky, inky, pinky, clyde;
     Ghost[] ghosts;
     BufferedImage[] ghostImages, pacmanImages; //pacmanImages is for the different orientations of pacman
+    BufferedImage wall;
 
     public Displayer(){
         super();
@@ -32,12 +33,18 @@ public class Displayer extends JPanel implements KeyListener
         started = false;
         gameover = false;
         ghosts = new Ghost[4];
-        ghostImages = pacmanImages = new BufferedImage[4];
+        ghostImages = new BufferedImage[4];
+        pacmanImages = new BufferedImage[4];
         try {
             ghostImages[0] = ImageIO.read(new File("blinky file.png"));
             ghostImages[1] = ImageIO.read(new File("pinky file.png"));
             ghostImages[2] = ImageIO.read(new File("inky file.png"));
             ghostImages[3] = ImageIO.read(new File("clyde file.png"));
+            pacmanImages[0] = ImageIO.read(new File("pacman 0.png"));
+            pacmanImages[1] = ImageIO.read(new File("pacman 1.png"));
+            pacmanImages[2] = ImageIO.read(new File("pacman 2.png"));
+            pacmanImages[3] = ImageIO.read(new File("pacman 3.png"));
+            wall = ImageIO.read(new File("wall.png"));
         } 
         catch(IOException e) {System.out.println("ERROR");};
         updater = new Timer(40, new ActionListener() {
@@ -46,15 +53,14 @@ public class Displayer extends JPanel implements KeyListener
             }
         });
         updater.start();
+        addKeyListener(this);
+        requestFocusInWindow();
     }
 
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         if (menu){
             //displayMenu(g); //<- this is the code that is suppose to be here
-            //world = new Maze(mazeWidth, mazeHeight); //debug
-            //user = new User(1, 1, 0); //debug
-            //displayGame(g); //debug -> test maze graphics
         }else if (game){
             if (pause){
                 displayPauseMenu(g);
@@ -63,7 +69,7 @@ public class Displayer extends JPanel implements KeyListener
                     world = new Maze(mazeHeight,mazeWidth);
                     user = new User(1,1,0);
                     ghosts[0] = new ChasingGhost(mazeWidth/2,mazeHeight/2,user, world); //blinky
-                    ghosts[1] = new AmbushGhost(1,mazeHeight - 2,user,world); //debug
+                    ghosts[1] = new AmbushGhost(mazeWidth/2,mazeHeight/2+1,user,world); //debug
                     ghosts[2] = new UnpredictableGhost(mazeWidth - 2, 1,user,world); //debug
                     ghosts[3] = new StupidGhost(mazeWidth - 2, mazeHeight - 2,user,world); //debug
                     updateTimerTask("GAME");
@@ -99,15 +105,9 @@ public class Displayer extends JPanel implements KeyListener
                 g.setColor(Color.BLACK);
                 g.fillRect(j*gridSize, i*gridSize, gridSize, gridSize);
                 if (world.grid[i][j].obstacle){
-                    g.setColor(Color.BLUE); //wall color
-                    g.fillRect(j*gridSize, i*gridSize, gridSize, gridSize);
-                }
-                else if (user.r == i && user.c == j){
-                    for (int l = 0; l < pacmanImages.length; l++) {
-                        if (user.orientation == l) {
-                            //g.drawImage(pacmanImages[l], i*gridSize, j*gridSize, gridSize, gridSize, null, null);
-                        }
-                    }
+                    /*g.setColor(Color.BLUE); //wall color
+                    g.fillRect(j*gridSize, i*gridSize, gridSize, gridSize);*/
+                    g.drawImage(wall,j*gridSize,i*gridSize,gridSize,gridSize, null, null);
                 }else if (world.grid[i][j].point){
                     g.setColor(Color.WHITE);
                     g.fillOval(j*gridSize, i*gridSize, pointSize, pointSize);
@@ -121,6 +121,7 @@ public class Displayer extends JPanel implements KeyListener
         for (int k = 0; k < ghosts.length; k++) {
             g.drawImage(ghostImages[k], ghosts[k].c*gridSize, ghosts[k].r*gridSize, gridSize, gridSize, null, null); 
         }
+        g.drawImage(pacmanImages[user.orientation], user.c*gridSize, user.r*gridSize, gridSize, gridSize, null, null);
     }
 
     public void displayGameOver(Graphics g){
@@ -175,7 +176,7 @@ public class Displayer extends JPanel implements KeyListener
                             user.c++;
                     }else if (e.getKeyCode() == KeyEvent.VK_LEFT){
                         user.orientation = 3;
-                        if (!world.outOfBound(user.c-1,true) && !world.grid[user.r][user.c-1].obstacle)
+                        if (!world.outOfBound(user.c-1,false) && !world.grid[user.r][user.c-1].obstacle)
                             user.c--;
                     }else if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
                         pause = true;
@@ -216,7 +217,7 @@ public class Displayer extends JPanel implements KeyListener
     public void updateTimerTask(String type){
         if (type.equals("GAME")){
             updater.stop();
-            updater = new Timer(40, new ActionListener() {
+            updater = new Timer(200, new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
                         //checkGhostsStatus();
                         //eatPoint();

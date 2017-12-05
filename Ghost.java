@@ -55,17 +55,17 @@ public abstract class Ghost
         int currRow = target.r;
         int currCol = target.c;
         if (target.orientation == 0){ // faces UP
-            while(!world.grid[currRow++][currCol].obstacle){}
-            return world.grid[currRow-1][currCol];
+            while(!world.grid[currRow--][currCol].obstacle){}
+            return world.grid[currRow+2][currCol];
         }else if (target.orientation == 1){ // faces RIGHT
             while(!world.grid[currRow][currCol++].obstacle){}
-            return world.grid[currRow][currCol-1];
+            return world.grid[currRow][currCol-2];
         }else if (target.orientation == 2){ // faces DOWN
-            while(!world.grid[currRow--][currCol].obstacle){}
-            return world.grid[currRow+1][currCol];
+            while(!world.grid[currRow++][currCol].obstacle){}
+            return world.grid[currRow-2][currCol];
         }else if (target.orientation == 3){ // faces LEFT
             while(!world.grid[currRow][currCol--].obstacle){}
-            return world.grid[currRow][currCol+1];
+            return world.grid[currRow][currCol+2];
         }else 
             return null;
     }
