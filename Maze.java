@@ -222,8 +222,8 @@ public class Maze extends JPanel {
         //place specific amount of "Big Points"
         //the rest are points
         ArrayList <Node> intersections = new ArrayList<Node>();
-        for (int r = 0; r < grid.length; r++ ) {
-            for (int c = 0; c < grid[0].length; c++) {
+        for (int r = 1; r < grid.length - 1; r++ ) {
+            for (int c = 1; c < grid[0].length - 1; c++) {
                 //up, right
                 if (grid[r-1][c].obstacle == false && grid[r][c+1].obstacle == false) {
                     intersections.add(grid[r][c]);
