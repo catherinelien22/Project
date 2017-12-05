@@ -220,7 +220,52 @@ public class Maze extends JPanel {
     public void addPoints(){
         //loop through the entire Maze
         //place specific amount of "Big Points"
-        //the rest are points   
+        //the rest are points
+        ArrayList <Node> intersections = new ArrayList<Node>();
+        for (int r = 0; r < grid.length; r++ ) {
+            for (int c = 0; c < grid[0].length; c++) {
+                //up, right
+                if (grid[r-1][c].obstacle == false && grid[r][c+1].obstacle == false) {
+                    intersections.add(grid[r][c]);
+                    continue;
+                }
+                
+                //up, left
+                if (grid[r-1][c].obstacle == false && grid[r][c-1].obstacle == false) {
+                    intersections.add(grid[r][c]);
+                    continue;
+                }
+                
+                //down left
+                if (grid[r+1][c].obstacle == false && grid[r][c-1].obstacle == false) {
+                    intersections.add(grid[r][c]);
+                    continue;
+                }
+                
+                //down right
+                if (grid[r+1][c].obstacle == false && grid[r][c+1].obstacle == false) {
+                    intersections.add(grid[r][c]);
+                }
+
+            }
+        }
+        
+        int num = 0;
+        int rand = 0;
+        while (num != 5) {
+            rand = (int)(Math.random() * intersections.size());
+            intersections.get(rand).bigPoint = true;
+            intersections.remove(rand);
+            num++;
+        }
+        
+        for (int r = 0; r < grid.length; r++) {
+            for (int c = 0; c < grid[0].length; c++) {
+                if (grid[r][c].obstacle == false && grid[r][c].bigPoint == false) {
+                    grid[r][c].point = true;
+                }
+            }
+        }
     }
 }
 
