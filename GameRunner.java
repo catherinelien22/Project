@@ -8,9 +8,11 @@ public class GameRunner
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Displayer game = new Displayer();
         frame.add(game);
-        frame.setSize(1280,720);
+        frame.setSize(1280,720);    
         //frame.pack();
         frame.setVisible(true);
         frame.setResizable(true);
+        game.menu = false;
+        game.game = true;
     }
 }

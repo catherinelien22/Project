@@ -6,35 +6,37 @@ public abstract class Ghost
 
     public Ghost(int a, int b, User user, Maze grid)
     {
-        r = a;
-        c = b;
+        r = b;
+        c = a;
         world = grid;
         target = user;
     }
 
     public abstract Node sense();
 
-    private String decide(Node stuff){
+    private String decide(Node goal){
         /*
          * preconditoin: the search function does not return diagonal results
          */
-        Node goal = sense();
+        if (goal == null)
+            return null;
         if (goal.r -r == 1) // if goal is one below
             return "DOWN";
         else if (goal.c-c == 1) // if goal one to the right
             return "RIGHT";
         else if (goal.r-r == -1) // if goal one above
             return "UP";
-        else if (goal.c-c == 1) // if goal one to the left
+        else if (goal.c-c == -1) // if goal one to the left
             return "LEFT";
-        else
-            return null;
+        return null;
     }
 
     private void act(String command){
         /*
          * precondition: the search function is correct and the direction is not an obstacle
          */
+        if (command == null)
+            return;
         if (command.equals("UP"))
             r--;
         else if (command.equals("DOWN"))

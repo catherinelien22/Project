@@ -17,27 +17,27 @@ public class Displayer extends JPanel implements KeyListener
 {
     boolean menu, pause, game, started, gameover, specialMode;
     int mazeWidth, mazeHeight = 0;
-        Timer updater;
-        Maze world;
-        User user;
-        Ghost blinky, inky, pinky, clyde;
-        static Ghost[] ghosts;
-        BufferedImage[] ghostImages, pacmanImages; //pacmanImages is for the different orientations of pacman
-        
-        public Displayer(){
-            super();
-            menu = true;
-            pause = false;
-            game = false;
-            started = false;
-            gameover = false;
-            specialMode = false;
-            mazeWidth = 19; //19, 25
-            mazeHeight = 25;
-            ghosts = new Ghost[4];
-            ghostImages = pacmanImages = new BufferedImage[4];
-            world = new Maze(mazeWidth, mazeHeight);
-            try {
+    Timer updater;
+    Maze world;
+    User user;
+    Ghost blinky, inky, pinky, clyde;
+    static Ghost[] ghosts;
+    BufferedImage[] ghostImages, pacmanImages; //pacmanImages is for the different orientations of pacman
+
+    public Displayer(){
+        super();
+        menu = true;
+        pause = false;
+        game = false;
+        started = false;
+        gameover = false;
+        specialMode = false;
+        mazeWidth = 19; //19, 25
+        mazeHeight = 25;
+        ghosts = new Ghost[4];
+        ghostImages = pacmanImages = new BufferedImage[4];
+        world = new Maze(mazeWidth, mazeHeight);
+        try {
             ghostImages[0] = ImageIO.read(new File("blinky file.png"));
             ghostImages[1] = ImageIO.read(new File("pinky file.png"));
             ghostImages[2] = ImageIO.read(new File("inky file.png"));
@@ -49,10 +49,10 @@ public class Displayer extends JPanel implements KeyListener
         } 
         catch(IOException e) {System.out.println("ERROR");};
         updater = new Timer(40, new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                repaint();
-            }
-        });
+                public void actionPerformed(ActionEvent evt) {
+                    repaint();
+                }
+            });
         updater.start();
     }
 
@@ -72,7 +72,7 @@ public class Displayer extends JPanel implements KeyListener
                 displayPauseMenu(g);
             }else{
                 if (!started){
-                    //world = new Maze(17,17);
+                    //world = new Maze(mazeWidth, mazeHeight);
                     //user = new User(1,1,0);
                     //blinky = new ChasingGhost(1,1,user, world); 
                     //pinky = new AmbushGhost(1,1,user,world);
@@ -214,8 +214,7 @@ public class Displayer extends JPanel implements KeyListener
             //if ghosts are in special mode, ghosts return to mid and get reset to normal mode
             //else user dies and then if user's life >= 0, reset the ghosts, else gameover
             //if (specialMode) { //return to center box }
-                
-            
+
         }
     }
 
@@ -239,7 +238,7 @@ public class Displayer extends JPanel implements KeyListener
         for (int i = 0; i < ghosts.length; i++) 
             ghosts[i].performSimpleAgentTask(); //ghost.performSimpleAgentTask() does not work
     }
-
+    
     public void updateTimerTask(String type){
         if (type.equals("GAME")){
             updater.stop();
