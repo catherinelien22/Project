@@ -12,6 +12,8 @@ public class GameRunner
         //frame.pack();
         frame.setVisible(true);
         frame.setResizable(true);
+        game.setFocusable(true);
+        game.requestFocusInWindow();
         game.menu = false;
         game.game = true;
     }
