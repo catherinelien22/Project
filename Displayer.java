@@ -16,14 +16,14 @@ import java.io.IOException;
 public class Displayer extends JPanel implements KeyListener
 {
     boolean menu, pause, game, started, gameover;
-    int mazeWidth, mazeHeight = 0;
+    final int mazeWidth = 25, mazeHeight = 19;
     Timer updater;
     Maze world;
     User user;
     Ghost blinky, inky, pinky, clyde;
     Ghost[] ghosts;
     BufferedImage[] ghostImages, pacmanImages; //pacmanImages is for the different orientations of pacman
-    
+
     public Displayer(){
         super();
         menu = true;
@@ -37,47 +37,36 @@ public class Displayer extends JPanel implements KeyListener
             ghostImages[0] = ImageIO.read(new File("blinky file.png"));
             ghostImages[1] = ImageIO.read(new File("pinky file.png"));
             ghostImages[2] = ImageIO.read(new File("inky file.png"));
-            ghostImages[3] = ImageIO.read(new File("clide file.png"));
+            ghostImages[3] = ImageIO.read(new File("clyde file.png"));
         } 
         catch(IOException e) {System.out.println("ERROR");};
-        //         updater = new Timer(40, new ActionListener() {
-        //             public void actionPerformed(ActionEvent evt) {
-        //                 repaint();
-        //             }
-        //         });
-        //         updater.start();
+                 updater = new Timer(40, new ActionListener() {
+                     public void actionPerformed(ActionEvent evt) {
+                         repaint();
+                     }
+                 });
+                 updater.start();
     }
 
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         if (menu){
             //displayMenu(g); //<- this is the code that is suppose to be here
-            mazeWidth = 19; //debug
-            mazeHeight = 25; //debug
-            world = new Maze(mazeWidth, mazeHeight); //debug
-            user = new User(1, 1, 0); //debug
-            ghosts[0] = new ChasingGhost(1,1,user, world); //debug
-            ghosts[1] = new AmbushGhost(1,mazeHeight - 2,user,world); //debug
-            ghosts[2] = new UnpredictableGhost(mazeWidth - 2, 1,user,world); //debug
-            ghosts[3] = new StupidGhost(mazeWidth - 2, mazeHeight - 2,user,world); //debug 
-            displayGame(g); //debug -> test maze graphics
+            //world = new Maze(mazeWidth, mazeHeight); //debug
+            //user = new User(1, 1, 0); //debug
+            //displayGame(g); //debug -> test maze graphics
         }else if (game){
             if (pause){
                 displayPauseMenu(g);
             }else{
                 if (!started){
-                    world = new Maze(17,17);
+                    world = new Maze(mazeHeight,mazeWidth);
                     user = new User(1,1,0);
-                    //blinky = new ChasingGhost(1,1,user, world); 
-                    //pinky = new AmbushGhost(1,1,user,world);
-                    //inky = new UnpredictableGhost(1,1,user,world);
-                    //clyde = new StupidGhost(1,1,user,world);
-
-                    ghosts[0] = new ChasingGhost(1,1,user, world); //blinky
-                    ghosts[1] = new AmbushGhost(1,1,user,world); //pinky
-                    ghosts[2] = new UnpredictableGhost(1,1,user,world); //inky
-                    ghosts[3] = new StupidGhost(1,1,user,world); //clide
-                    //update timer task
+                    ghosts[0] = new ChasingGhost(mazeWidth/2,mazeHeight/2,user, world); //blinky
+                    ghosts[1] = new AmbushGhost(1,mazeHeight - 2,user,world); //debug
+                    ghosts[2] = new UnpredictableGhost(mazeWidth - 2, 1,user,world); //debug
+                    ghosts[3] = new StupidGhost(mazeWidth - 2, mazeHeight - 2,user,world); //debug
+                    updateTimerTask("GAME");
                     started = true;
                 }else if (started && !gameover){
                     displayGame(g);
@@ -108,15 +97,10 @@ public class Displayer extends JPanel implements KeyListener
             for (int j = 0; j < world.grid[i].length; j++){
                 //add background for all cases
                 g.setColor(Color.BLACK);
-                g.fillRect(i*gridSize, j*gridSize, gridSize, gridSize);
-                for (int k = 0; k < ghosts.length; k++) {
-                    if (ghosts[k].r == i && ghosts[k].c == j) {
-                        g.drawImage(ghostImages[k], i*gridSize, j*gridSize, gridSize, gridSize, null, null); 
-                    }
-                }
+                g.fillRect(j*gridSize, i*gridSize, gridSize, gridSize);
                 if (world.grid[i][j].obstacle){
                     g.setColor(Color.BLUE); //wall color
-                    g.fillRect(i*gridSize, j*gridSize, gridSize, gridSize);
+                    g.fillRect(j*gridSize, i*gridSize, gridSize, gridSize);
                 }
                 else if (user.r == i && user.c == j){
                     for (int l = 0; l < pacmanImages.length; l++) {
@@ -126,12 +110,16 @@ public class Displayer extends JPanel implements KeyListener
                     }
                 }else if (world.grid[i][j].point){
                     g.setColor(Color.WHITE);
-                    g.fillOval(i*gridSize, j*gridSize, pointSize, pointSize);
+                    g.fillOval(j*gridSize, i*gridSize, pointSize, pointSize);
                 }else if (world.grid[i][j].bigPoint){
                     g.setColor(Color.WHITE);
-                    g.fillOval(i*gridSize, j*gridSize, bigPointSize, bigPointSize);
+                    g.fillOval(j*gridSize, i*gridSize, bigPointSize, bigPointSize);
                 }
             }
+        }
+        //draw the ghosts
+        for (int k = 0; k < ghosts.length; k++) {
+            g.drawImage(ghostImages[k], ghosts[k].c*gridSize, ghosts[k].r*gridSize, gridSize, gridSize, null, null); 
         }
     }
 
@@ -221,10 +209,9 @@ public class Displayer extends JPanel implements KeyListener
     }
 
     public void ghostUpdate(){
-        pinky.performSimpleAgentTask();
-        inky.performSimpleAgentTask();
-        blinky.performSimpleAgentTask();
-        clyde.performSimpleAgentTask();
+        /*for (int i = 0; i < ghosts.length; i++)
+            ghosts[i].performSimpleAgentTask();*/
+        ghosts[0].performSimpleAgentTask();
     }
 
     public void updateTimerTask(String type){
@@ -232,10 +219,10 @@ public class Displayer extends JPanel implements KeyListener
             updater.stop();
             updater = new Timer(40, new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
-                        checkGhostsStatus();
-                        eatPoint();
+                        //checkGhostsStatus();
+                        //eatPoint();
                         ghostUpdate();
-                        checkVictory();
+                        //checkVictory();
                         repaint();
                     }
                 });

@@ -12,5 +12,7 @@ public class GameRunner
         //frame.pack();
         frame.setVisible(true);
         frame.setResizable(true);
+        game.menu = false;
+        game.game = true;
     }
 }
