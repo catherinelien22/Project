@@ -7,13 +7,10 @@ import java.awt.Graphics;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
 public class Maze extends JPanel {
-    public Node[][] grid;
-    public int width,height;
+    public static Node[][] grid;
+    public static int width,height;
     public Maze(int r, int c){
-        
-        if (r%2 == 0 || c % 2 == 0)
-            return;
-        else{
+        if (((r-1)/2)%2==1 && ((c-3)/2)%2==1){
             grid = new Node[r][c];
             width = c; height = r;
             //set everything to wall
@@ -21,8 +18,21 @@ public class Maze extends JPanel {
                 for (int j = 0; j < c; j++){
                     grid[i][j] = new Node(i,j);
                     grid[i][j].obstacle = true;
-                }
-            grid[1][1].obstacle = false;
+                } 
+            //set middle part to not wall to prevent expansion there
+            grid[r/2][c/2-1].obstacle = false;
+            grid[r/2][c/2].obstacle = false;
+            grid[r/2+1][c/2].obstacle = false;
+            grid[r/2+2][c/2].obstacle = false;
+            grid[r/2][c/2+1].obstacle = false;
+            grid[r/2][c/2-1].obstacle = false;
+            grid[r/2][c/2-2].unbreakable = true;
+            grid[r/2][c/2+2].unbreakable=true;
+            grid[r/2-1][c/2-1].unbreakable = true;
+            grid[r/2-1][c/2].unbreakable= true;
+            grid[r/2-1][c/2+1].unbreakable = true;
+            grid[r/2+1][c/2-1].unbreakable = true;
+            grid[r/2+1][c/2+1].unbreakable = true;
             recursiveDFSGenerate(1,1);
             removeDeadEnds();
             addPoints();
@@ -78,13 +88,15 @@ public class Maze extends JPanel {
         }
     }    
     //get rid of the dead ends
-    public void removeDeadEnds() {
+    public static void removeDeadEnds() {
         for (int r = 1; r < grid.length-1; r++) {
             for (int c = 1; c < grid[0].length-1; c++) {
                 if (!grid[r][c].obstacle) {// if current isn't a wall
                     //check if has dead ends
                     boolean[] status = {grid[r+1][c].obstacle,grid[r][c+1].obstacle,grid[r-1][c].obstacle,grid[r][c-1].obstacle};
                     int blockedSides = countWalls(status);
+                    if (r == height/2 && c == width/2+1) continue;
+                    if (r== height/2 && c == width/2-1) continue;
                     if (blockedSides != 3)
                         continue;
                     else{
@@ -92,7 +104,8 @@ public class Maze extends JPanel {
                         while(!removedWall){
                             switch((int)(Math.random()*4)+1){
                                 case 1:
-                                if (outOfBound(r+1,true) || !grid[r+1][c].obstacle)
+                                if (outOfBound(r+1,true) || (grid[r+1][c].obstacle && grid[r+1][c].unbreakable) || 
+                                !grid[r+1][c].obstacle)
                                     continue;
                                 else{
                                     grid[r+1][c].obstacle = false;
@@ -100,7 +113,8 @@ public class Maze extends JPanel {
                                     continue;
                                 }
                                 case 2:
-                                if (outOfBound(c+1,false) || !grid[r][c+1].obstacle)
+                                if (outOfBound(c+1,false) || (grid[r][c+1].unbreakable&& grid[r][c+1].obstacle )|| 
+                                !grid[r][c+1].obstacle)
                                     continue;
                                 else{
                                     grid[r][c+1].obstacle = false;
@@ -108,7 +122,8 @@ public class Maze extends JPanel {
                                     continue;
                                 }
                                 case 3:
-                                if (outOfBound(r-1,true) || !grid[r-1][c].obstacle)
+                                if (outOfBound(r-1,true) || (grid[r-1][c].unbreakable && grid[r-1][c].obstacle) || 
+                                !grid[r-1][c].obstacle)
                                     continue;
                                 else{
                                     grid[r-1][c].obstacle = false;
@@ -116,7 +131,8 @@ public class Maze extends JPanel {
                                     continue;
                                 }
                                 case 4:
-                                if (outOfBound(c-1,false) || !grid[r][c-1].obstacle)
+                                if (outOfBound(c-1,false) || (grid[r][c-1].unbreakable&& grid[r][c-1].obstacle )|| 
+                                !grid[r][c-1].obstacle)
                                     continue;
                                 else{
                                     grid[r][c-1].obstacle = false;
@@ -131,7 +147,7 @@ public class Maze extends JPanel {
         }
     }
 
-    public int countWalls(boolean[] stuff){
+    public static int countWalls(boolean[] stuff){
         int ans = 0;
         for (int i = 0; i < stuff.length; i++)
             if (stuff[i])
@@ -139,7 +155,7 @@ public class Maze extends JPanel {
         return ans;
     }
 
-    public boolean outOfBound(int i, boolean r){
+    public static boolean outOfBound(int i, boolean r){
         if (r){
             if (i <height-1 && i >0)
                 return false;
@@ -152,13 +168,19 @@ public class Maze extends JPanel {
 
     //just for debugging don't use it lmao
     public static void main (String[] args){
-        Maze stuff = new Maze(17,17);
+        Maze stuff = new Maze(19,25);
         StdDraw.setCanvasSize(700,700);
         StdDraw.setYscale(0,700);
         StdDraw.setXscale(0,700);
+        drawMap(stuff);
+    }
+
+    public static void drawMap(Maze stuff){
         for (int i = 0; i < stuff.height; i++){
             for (int j = 0; j < stuff.width; j++){
-                if (stuff.grid[i][j].obstacle){
+                if (stuff.grid[i][j].unbreakable){
+                    StdDraw.setPenColor(StdDraw.GREEN);
+                }else if (stuff.grid[i][j].obstacle){
                     StdDraw.setPenColor(StdDraw.BLACK);
                 }else{
                     StdDraw.setPenColor(StdDraw.WHITE);
@@ -166,21 +188,13 @@ public class Maze extends JPanel {
                 StdDraw.filledRectangle(j*20+10,i*20+10,10,10);
                 StdDraw.setPenColor(StdDraw.BLACK);
                 StdDraw.rectangle(j*20+10,i*20+10,10,10);
-            }
-        }
-
-        stuff.removeDeadEnds();
-
-        for (int i = 0; i < stuff.height; i++){
-            for (int j = 0; j < stuff.width; j++){
-                if (stuff.grid[i][j].obstacle){
-                    StdDraw.setPenColor(StdDraw.BLACK);
-                }else{
-                    StdDraw.setPenColor(StdDraw.WHITE);
+                if (stuff.grid[i][j].bigPoint){
+                    StdDraw.setPenColor(StdDraw.RED);
+                    StdDraw.filledCircle(j*20+10, i*20+10,6);
+                }else if (stuff.grid[i][j].point){
+                    StdDraw.setPenColor(StdDraw.YELLOW);
+                    StdDraw.filledCircle(j*20+10, i*20+10,6);
                 }
-                StdDraw.filledRectangle(j*20+350,i*20+350,10,10);
-                StdDraw.setPenColor(StdDraw.BLACK);
-                StdDraw.rectangle(j*20+350,i*20+350,10,10);
             }
         }
     }
@@ -217,7 +231,16 @@ public class Maze extends JPanel {
         }
     }
 
-    public void addPoints(){
+    public static boolean isTurn(boolean[] stuff){
+        if (countWalls(stuff) != 2)
+            return false;
+        for (int i = 0; i < stuff.length; i++)
+            if (!stuff[(i+stuff.length)%stuff.length] && !stuff[(i+1+stuff.length)%stuff.length])
+                return true;
+        return false;
+    }
+
+    public static void addPoints(){
         //loop through the entire Maze
         //place specific amount of "Big Points"
         //the rest are points
@@ -229,40 +252,40 @@ public class Maze extends JPanel {
                     intersections.add(grid[r][c]);
                     continue;
                 }
-                
+
                 //up, left
                 if (grid[r-1][c].obstacle == false && grid[r][c-1].obstacle == false) {
                     intersections.add(grid[r][c]);
                     continue;
                 }
-                
+
                 //down left
                 if (grid[r+1][c].obstacle == false && grid[r][c-1].obstacle == false) {
                     intersections.add(grid[r][c]);
-                    continue;
-                }
-                
-                //down right
-                if (grid[r+1][c].obstacle == false && grid[r][c+1].obstacle == false) {
-                    intersections.add(grid[r][c]);
-                }
-
-            }
-        }
-        
-        int num = 0;
-        int rand = 0;
-        while (num != 5) {
-            rand = (int)(Math.random() * intersections.size());
-            intersections.get(rand).bigPoint = true;
-            intersections.remove(rand);
-            num++;
-        }
-        
-        for (int r = 0; r < grid.length; r++) {
-            for (int c = 0; c < grid[0].length; c++) {
-                if (grid[r][c].obstacle == false && grid[r][c].bigPoint == false) {
-                    grid[r][c].point = true;
+                    for (int r = 1; r < grid.length-1; r++ ) {
+                        for (int c = 1; c < grid[0].length-1; c++) {
+                            if (grid[r][c].obstacle)
+                                continue;
+                            boolean[] surrounding = {grid[r+1][c].obstacle,grid[r][c+1].obstacle,grid[r-1][c].obstacle,grid[r][c-1].obstacle};
+                            if (isTurn(surrounding))
+                                intersections.add(grid[r][c]);
+                        }
+                    }        
+                    int num = 0;
+                    int rand = 0;
+                    while (num != 5) {
+                        rand = (int)(Math.random() * intersections.size());
+                        intersections.get(rand).bigPoint = true;
+                        intersections.remove(rand);
+                        num++;
+                    }        
+                    for (int r = 0; r < grid.length; r++) {
+                        for (int c = 0; c < grid[0].length; c++) {
+                            if (grid[r][c].obstacle == false && grid[r][c].bigPoint == false) {
+                                grid[r][c].point = true;
+                            }
+                        }
+                    }
                 }
             }
         }

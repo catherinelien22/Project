@@ -23,6 +23,7 @@ public class Displayer extends JPanel implements KeyListener
     Ghost blinky, inky, pinky, clyde;
     Ghost[] ghosts;
     BufferedImage[] ghostImages, pacmanImages; //pacmanImages is for the different orientations of pacman
+    
     public Displayer(){
         super();
         menu = true;
