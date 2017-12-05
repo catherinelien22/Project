@@ -36,15 +36,15 @@ public class Displayer extends JPanel implements KeyListener
             ghostImages[0] = ImageIO.read(new File("blinky file.png"));
             ghostImages[1] = ImageIO.read(new File("pinky file.png"));
             ghostImages[2] = ImageIO.read(new File("inky file.png"));
-            ghostImages[3] = ImageIO.read(new File("clide file.png"));
+            ghostImages[3] = ImageIO.read(new File("clyde file.png"));
         } 
         catch(IOException e) {System.out.println("ERROR");};
-        //         updater = new Timer(40, new ActionListener() {
-        //             public void actionPerformed(ActionEvent evt) {
-        //                 repaint();
-        //             }
-        //         });
-        //         updater.start();
+        updater = new Timer(40, new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                repaint();
+            }
+        });
+        updater.start();
     }
 
     public void paintComponent(Graphics g){
@@ -60,6 +60,7 @@ public class Displayer extends JPanel implements KeyListener
             ghosts[2] = new UnpredictableGhost(mazeWidth - 2, 1,user,world); //debug
             ghosts[3] = new StupidGhost(mazeWidth - 2, mazeHeight - 2,user,world); //debug 
             displayGame(g); //debug -> test maze graphics
+            updateTimerTask("GAME");
         }else if (game){
             if (pause){
                 displayPauseMenu(g);
@@ -125,10 +126,10 @@ public class Displayer extends JPanel implements KeyListener
                     }
                 }else if (world.grid[i][j].point){
                     g.setColor(Color.WHITE);
-                    g.fillOval(i*gridSize, j*gridSize, pointSize, pointSize);
+                    g.fillOval(i*gridSize+pointSize, j*gridSize + pointSize, pointSize, pointSize);
                 }else if (world.grid[i][j].bigPoint){
                     g.setColor(Color.WHITE);
-                    g.fillOval(i*gridSize, j*gridSize, bigPointSize, bigPointSize);
+                    g.fillOval(i*gridSize+pointSize, j*gridSize+pointSize, bigPointSize, bigPointSize);
                 }
             }
         }
@@ -220,10 +221,8 @@ public class Displayer extends JPanel implements KeyListener
     }
 
     public void ghostUpdate(){
-        pinky.performSimpleAgentTask();
-        inky.performSimpleAgentTask();
-        blinky.performSimpleAgentTask();
-        clyde.performSimpleAgentTask();
+        for (int i = 0; i < ghosts.length; i++) 
+            ghosts[i].performSimpleAgentTask(); //ghost.performSimpleAgentTask() does not work
     }
 
     public void updateTimerTask(String type){
@@ -231,9 +230,9 @@ public class Displayer extends JPanel implements KeyListener
             updater.stop();
             updater = new Timer(40, new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
-                        checkGhostsStatus();
+                        //checkGhostsStatus(); //commented out bc it is empty
                         eatPoint();
-                        ghostUpdate();
+                        ghostUpdate(); 
                         checkVictory();
                         repaint();
                     }
