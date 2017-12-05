@@ -10,7 +10,7 @@ public class GameRunner
         Displayer game = new Displayer();
         frame.add(game);
         frame.setSize(1280,720);
-        frame.pack();
+        //frame.pack();
         frame.setVisible(true);
         frame.setResizable(true);
     }

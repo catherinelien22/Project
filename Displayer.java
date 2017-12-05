@@ -2,10 +2,15 @@ import java.awt.Graphics;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
 import javax.swing.Timer;
+import javax.imageio.ImageIO;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class Displayer extends JPanel implements KeyListener
 {
@@ -14,7 +19,8 @@ public class Displayer extends JPanel implements KeyListener
     Maze world;
     User user;
     Ghost blinky, inky, pinky, clyde;
-
+    Ghost[] ghosts;
+    BufferedImage[] ghostImages, pacmanImages; //pacmanImages is for the different orientations of pacman
     public Displayer(){
         super();
         menu = true;
@@ -22,18 +28,34 @@ public class Displayer extends JPanel implements KeyListener
         game = false;
         started = false;
         gameover = false;
-        updater = new Timer(40, new ActionListener() {
-                public void actionPerformed(ActionEvent evt) {
-                    repaint();
-                }
-            });
-        updater.start();
+        ghosts = new Ghost[4];
+        ghostImages = pacmanImages = new BufferedImage[4];
+//         try {
+//             ghostImages[0] = ImageIO.read(new File("blinky file"));
+//             ghostImages[1] = ImageIO.read(new File("pinky file"));
+//             ghostImages[2] = ImageIO.read(new File("inky file"));
+//             ghostImages[3] = ImageIO.read(new File("clide file"));
+//         } 
+//         catch(IOException e) {};
+//         updater = new Timer(40, new ActionListener() {
+//                 public void actionPerformed(ActionEvent evt) {
+//                     repaint();
+//                 }
+//             });
+//         updater.start();
     }
 
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         if (menu){
-            displayMenu(g);
+            //displayMenu(g); <- this is the code that is suppose to be here
+            world = new Maze(17, 17); //debug
+            user = new User(1, 1, 0); //debug
+            ghosts[0] = new ChasingGhost(1,1,user, world); //debug
+            ghosts[1] = new AmbushGhost(1,1,user,world); //debug
+            ghosts[2] = new UnpredictableGhost(1,1,user,world); //debug
+            ghosts[3] = new StupidGhost(1,1,user,world); //debug
+            displayGame(g); //debug -> test maze graphics
         }else if (game){
             if (pause){
                 displayPauseMenu(g);
@@ -41,10 +63,15 @@ public class Displayer extends JPanel implements KeyListener
                 if (!started){
                     world = new Maze(17,17);
                     user = new User(1,1,0);
-                    blinky = new ChasingGhost(1,1,user, world); 
-                    pinky = new AmbushGhost(1,1,user,world);
-                    inky = new UnpredictableGhost(1,1,user,world);
-                    clyde = new StupidGhost(1,1,user,world);
+                    //blinky = new ChasingGhost(1,1,user, world); 
+                    //pinky = new AmbushGhost(1,1,user,world);
+                    //inky = new UnpredictableGhost(1,1,user,world);
+                    //clyde = new StupidGhost(1,1,user,world);
+
+                    ghosts[0] = new ChasingGhost(1,1,user, world); //blinky
+                    ghosts[1] = new AmbushGhost(1,1,user,world); //pinky
+                    ghosts[2] = new UnpredictableGhost(1,1,user,world); //inky
+                    ghosts[3] = new StupidGhost(1,1,user,world); //clide
                     //update timer task
                     started = true;
                 }else if (started && !gameover){
@@ -67,26 +94,42 @@ public class Displayer extends JPanel implements KeyListener
     }
 
     public void displayGame(Graphics g){
+<<<<<<< HEAD
         //top menu for points and lives and time
+=======
+        final int gridSize = 20; //these are random numbers
+        final int pointSize = 10;
+        final int bigPointSize = 15;
+>>>>>>> 43c553ed547237503e5b5f6006becf2c967b874e
         for( int i = 0; i < world.grid.length; i++){
             for (int j = 0; j < world.grid[i].length; j++){
                 //add background for all cases
+                g.setColor(Color.BLACK);
+                g.fillRect(i*gridSize, j*gridSize, gridSize, gridSize);
+                for (int k = 0; k < ghosts.length; k++) {
+                    if (ghosts[k].r == i && ghosts[k].c == j) {
+                        //g.drawImage(ghostImages[k], i*gridSize, j*gridSize, gridSize, gridSize, null, null);  
+                    }
+                }
                 if (world.grid[i][j].obstacle){
-
-                }else if (blinky.r == i && blinky.c == j){
-
-                }else if (pinky.r == i && pinky.c == j){
-
-                }else if (inky.r == i && inky.c == j){
-
-                }else if (clyde.r == i && clyde.c == j){
-
-                }else if (user.r == i && user.c == j){
-
+                    g.setColor(Color.BLUE); //wall color
+                    g.drawRect(i*gridSize, j*gridSize, gridSize, gridSize);
+                }//else if (blinky.r == i && blinky.c == j){}    
+                //else if (pinky.r == i && pinky.c == j){}
+                //else if (inky.r == i && inky.c == j){}
+                //else if (clyde.r == i && clyde.c == j){}
+                else if (user.r == i && user.c == j){
+                    for (int l = 0; l < pacmanImages.length; l++) {
+                        if (user.orientation == l) {
+                            //g.drawImage(pacmanImages[l], i*gridSize, j*gridSize, gridSize, gridSize, null, null);
+                        }
+                    }
                 }else if (world.grid[i][j].point){
-
+                    g.setColor(Color.WHITE);
+                    g.fillOval(i*gridSize, j*gridSize, pointSize, pointSize);
                 }else if (world.grid[i][j].bigPoint){
-
+                    g.setColor(Color.WHITE);
+                    g.fillOval(i*gridSize, j*gridSize, bigPointSize, bigPointSize);
                 }
             }
         }
@@ -167,7 +210,7 @@ public class Displayer extends JPanel implements KeyListener
     public void checkVictory(){
         //something happens
     }
-
+    
     public void eatPoint(){
         if (world.grid[user.r][user.c].point){
             //add to score
