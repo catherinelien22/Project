@@ -23,6 +23,8 @@ public class Displayer extends JPanel implements KeyListener
     Ghost blinky, inky, pinky, clyde;
     Ghost[] ghosts;
     BufferedImage[] ghostImages, pacmanImages; //pacmanImages is for the different orientations of pacman
+    BufferedImage wall;
+    final Dimension frameSize = GameRunner.frame.getContentPane().getSize();
 
     public Displayer(){
         super();
@@ -84,6 +86,29 @@ public class Displayer extends JPanel implements KeyListener
     public void displayMenu(Graphics g){
         //background picture
         //"selected" buttons are bigger
+        //work in progress
+        //         BufferedImage buttonImage;
+        //         final int buttonWidth = ;
+        //         final int buttonHeight = ;
+        //         int buttonX = ;
+        //         int buttonY = ;
+        //         Button startButton = new Button("Start", true);
+        //         Button quitButton = new Button("Quit", false);
+        //         for (int i = 0; i < displayMenuButtons.length; i++) {
+        //             if (displayMenuButtons[i].selected) {
+        //                 buttonImage = new ImageIO(new File("selected button.png")); 
+        //             }
+        //             else {
+        //                 buttonImage = new ImageIO(new File("button.png"));
+        //             }
+        //             g.drawImage(buttonImage, buttonX, buttonY, buttonWidth, buttonHeight, null, null);
+        //             //g.setFont();
+        //             //g.setColor();
+        //             g.drawString(displayMenuButtons[i].text, buttonX, buttonY);
+        //             buttonX += ;
+        //             buttonY += ;    
+        //         }
+
     }
 
     public void displayPauseMenu(Graphics g){
@@ -93,7 +118,6 @@ public class Displayer extends JPanel implements KeyListener
 
     public void displayGame(Graphics g){
         //top menu for points and lives and time
-        final Dimension frameSize = GameRunner.frame.getContentPane().getSize();
         final int gridSize =  (int) (frameSize.getHeight() / mazeHeight); 
         final int pointSize = 10;
         final int bigPointSize = 15;
@@ -218,11 +242,12 @@ public class Displayer extends JPanel implements KeyListener
     public void keyPressed(KeyEvent e){
         if (menu){
             if (e.getKeyCode() == KeyEvent.VK_DOWN){
-
+                //updateTimerTask();
             }else if (e.getKeyCode() == KeyEvent.VK_UP){
-
+                //updateTimeTask();
             }else if (e.getKeyCode() == KeyEvent.VK_ENTER){
-
+                //game = true;
+                //menu = false;
             }
         }else if (game){
             if (pause){
