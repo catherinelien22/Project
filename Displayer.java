@@ -15,29 +15,37 @@ import java.io.IOException;
 
 public class Displayer extends JPanel implements KeyListener
 {
-    boolean menu, pause, game, started, gameover;
+    boolean menu, pause, game, started, gameover, specialMode;
     int mazeWidth, mazeHeight = 0;
-    Timer updater;
-    Maze world;
-    User user;
-    Ghost blinky, inky, pinky, clyde;
-    Ghost[] ghosts;
-    BufferedImage[] ghostImages, pacmanImages; //pacmanImages is for the different orientations of pacman
-    
-    public Displayer(){
-        super();
-        menu = true;
-        pause = false;
-        game = false;
-        started = false;
-        gameover = false;
-        ghosts = new Ghost[4];
-        ghostImages = pacmanImages = new BufferedImage[4];
-        try {
+        Timer updater;
+        Maze world;
+        User user;
+        Ghost blinky, inky, pinky, clyde;
+        static Ghost[] ghosts;
+        BufferedImage[] ghostImages, pacmanImages; //pacmanImages is for the different orientations of pacman
+        
+        public Displayer(){
+            super();
+            menu = true;
+            pause = false;
+            game = false;
+            started = false;
+            gameover = false;
+            specialMode = false;
+            mazeWidth = 19; //19, 25
+            mazeHeight = 25;
+            ghosts = new Ghost[4];
+            ghostImages = pacmanImages = new BufferedImage[4];
+            world = new Maze(mazeWidth, mazeHeight);
+            try {
             ghostImages[0] = ImageIO.read(new File("blinky file.png"));
             ghostImages[1] = ImageIO.read(new File("pinky file.png"));
             ghostImages[2] = ImageIO.read(new File("inky file.png"));
             ghostImages[3] = ImageIO.read(new File("clyde file.png"));
+            //pacmanImages[0] = ImageIO.read(new File("pacman 0.png")); //up
+            //pacmanImages[1] = ImageIO.read(new File("pacman 1.png")); //right
+            //pacmanImages[2] = ImageIO.read(new File("pacman 2.png")); //down
+            //pacmanImages[3] = ImageIO.read(new File("pacman 3.png")); //left
         } 
         catch(IOException e) {System.out.println("ERROR");};
         updater = new Timer(40, new ActionListener() {
@@ -52,14 +60,11 @@ public class Displayer extends JPanel implements KeyListener
         super.paintComponent(g);
         if (menu){
             //displayMenu(g); //<- this is the code that is suppose to be here
-            mazeWidth = 19; //debug
-            mazeHeight = 25; //debug
-            world = new Maze(mazeWidth, mazeHeight); //debug
-            user = new User(1, 1, 0); //debug
-            ghosts[0] = new ChasingGhost(1,1,user, world); //debug
-            ghosts[1] = new AmbushGhost(1,mazeHeight - 2,user,world); //debug
-            ghosts[2] = new UnpredictableGhost(mazeWidth - 2, 1,user,world); //debug
-            ghosts[3] = new StupidGhost(mazeWidth - 2, mazeHeight - 2,user,world); //debug 
+            user = new User(1,1,0); //debug            
+            ghosts[0] = new ChasingGhost(mazeWidth / 2 + 1, mazeHeight / 2,user, world); //debug
+            ghosts[1] = new AmbushGhost(mazeWidth / 2, mazeHeight / 2,user,world); //debug
+            ghosts[2] = new UnpredictableGhost(mazeWidth / 2, mazeHeight / 2 - 1, user,world); //debug
+            ghosts[3] = new StupidGhost(mazeWidth / 2, mazeHeight / 2 + 1,user,world); //debug          
             displayGame(g); //debug -> test maze graphics
             updateTimerTask("GAME");
         }else if (game){
@@ -67,8 +72,8 @@ public class Displayer extends JPanel implements KeyListener
                 displayPauseMenu(g);
             }else{
                 if (!started){
-                    world = new Maze(17,17);
-                    user = new User(1,1,0);
+                    //world = new Maze(17,17);
+                    //user = new User(1,1,0);
                     //blinky = new ChasingGhost(1,1,user, world); 
                     //pinky = new AmbushGhost(1,1,user,world);
                     //inky = new UnpredictableGhost(1,1,user,world);
@@ -115,14 +120,17 @@ public class Displayer extends JPanel implements KeyListener
                         g.drawImage(ghostImages[k], i*gridSize, j*gridSize, gridSize, gridSize, null, null); 
                     }
                 }
-                if (world.grid[i][j].obstacle){
+                if (world.grid[i][j].unbreakable){
+                    g.setColor(Color.YELLOW);
+                    g.fillRect(i*gridSize, j*gridSize, gridSize, gridSize);
+                }else if (world.grid[i][j].obstacle){
                     g.setColor(Color.BLUE); //wall color
                     g.fillRect(i*gridSize, j*gridSize, gridSize, gridSize);
                 }
                 else if (user.r == i && user.c == j){
                     for (int l = 0; l < pacmanImages.length; l++) {
                         if (user.orientation == l) {
-                            //g.drawImage(pacmanImages[l], i*gridSize, j*gridSize, gridSize, gridSize, null, null);
+                            //g.drawImage(pacmanImages[1], i*gridSize, j*gridSize, gridSize, gridSize, null, null);
                         }
                     }
                 }else if (world.grid[i][j].point){
@@ -131,7 +139,7 @@ public class Displayer extends JPanel implements KeyListener
                 }else if (world.grid[i][j].bigPoint){
                     g.setColor(Color.WHITE);
                     g.fillOval(i*gridSize+pointSize, j*gridSize+pointSize, bigPointSize, bigPointSize);
-                }
+                }                
             }
         }
     }
@@ -205,18 +213,24 @@ public class Displayer extends JPanel implements KeyListener
         (user.r == blinky.r && user.c == blinky.c)||(user.r == blinky.r && user.c == blinky.c)){
             //if ghosts are in special mode, ghosts return to mid and get reset to normal mode
             //else user dies and then if user's life >= 0, reset the ghosts, else gameover
+            //if (specialMode) { //return to center box }
+                
+            
         }
     }
 
     public void checkVictory(){
         //something happens
+        //if no more points you win
     }
 
     public void eatPoint(){
         if (world.grid[user.r][user.c].point){
             //add to score
+            //score++;
             world.grid[user.r][user.c].point = false;
         }else if (world.grid[user.r][user.c].bigPoint){
+            //specialMode = true;
             world.grid[user.r][user.c].bigPoint = false;
         }
     }
@@ -232,9 +246,9 @@ public class Displayer extends JPanel implements KeyListener
             updater = new Timer(40, new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
                         //checkGhostsStatus(); //commented out bc it is empty
-                        eatPoint();
-                        ghostUpdate(); 
-                        checkVictory();
+                        //eatPoint();
+                        //ghostUpdate(); 
+                        //checkVictory();
                         repaint();
                     }
                 });
