@@ -2,10 +2,9 @@ import javax.swing.JFrame;
 
 public class GameRunner
 {
-    
-    
+    static JFrame frame;
     public static void main (String args[]){
-        JFrame frame = new JFrame("Pac-Man");
+        frame = new JFrame("Pac-Man");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Displayer game = new Displayer();
         frame.add(game);
