@@ -1,0 +1,14 @@
+#BlueJ class context
+comment0.params=a\ b\ user\ grid
+comment0.target=Ghost(int,\ int,\ User,\ Maze)
+comment1.params=
+comment1.target=Node\ sense()
+comment2.params=goal
+comment2.target=java.lang.String\ decide(Node)
+comment3.params=command
+comment3.target=void\ act(java.lang.String)
+comment4.params=
+comment4.target=void\ performSimpleAgentTask()
+comment5.params=
+comment5.target=Node\ findAmbushPoint()
+numComments=6

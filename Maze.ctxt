@@ -1,0 +1,22 @@
+#BlueJ class context
+comment0.params=r\ c
+comment0.target=Maze(int,\ int)
+comment1.params=r\ c
+comment1.target=void\ recursiveDFSGenerate(int,\ int)
+comment2.params=
+comment2.target=void\ removeDeadEnds()
+comment3.params=stuff
+comment3.target=int\ countWalls(boolean[])
+comment4.params=i\ r
+comment4.target=boolean\ outOfBound(int,\ boolean)
+comment5.params=args
+comment5.target=void\ main(java.lang.String[])
+comment6.params=stuff
+comment6.target=void\ drawMap(Maze)
+comment7.params=g
+comment7.target=void\ paintComponent(java.awt.Graphics)
+comment8.params=stuff
+comment8.target=boolean\ isTurn(boolean[])
+comment9.params=
+comment9.target=void\ addPoints()
+numComments=10

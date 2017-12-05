@@ -1,0 +1,8 @@
+#BlueJ class context
+comment0.params=a\ b\ o
+comment0.target=User(int,\ int,\ int)
+comment1.params=
+comment1.target=void\ die()
+comment2.params=
+comment2.target=void\ resurrect()
+numComments=3
