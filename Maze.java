@@ -33,6 +33,18 @@ public class Maze extends JPanel {
             grid[r/2-1][c/2+1].unbreakable = true;
             grid[r/2+1][c/2-1].unbreakable = true;
             grid[r/2+1][c/2+1].unbreakable = true;
+            grid[r/2][c/2].center = true;
+            grid[r/2][c/2-1].center = true;
+            grid[r/2][c/2+1].center = true;
+            grid[r/2+1][c/2].center = true;
+
+            for (int i = 0; i < r; i++) {
+                for(int j = 0; j < c; j++) {
+                    if (grid[i][j].unbreakable)
+                        grid[i][j].obstacle = false;
+                }
+            }
+
             recursiveDFSGenerate(1,1);
             removeDeadEnds();
             addPoints();
@@ -247,27 +259,29 @@ public class Maze extends JPanel {
         ArrayList <Node> intersections = new ArrayList<Node>();
         for (int r = 1; r < grid.length - 1; r++ ) {
             for (int c = 1; c < grid[0].length - 1; c++) {
-                //up, right
-                if (grid[r-1][c].obstacle == false && grid[r][c+1].obstacle == false) {
-                    intersections.add(grid[r][c]);
-                    continue;
-                }
+                if (!grid[r][c].center) {
+                    //up, right
+                    if (grid[r-1][c].obstacle == false && grid[r][c+1].obstacle == false) {
+                        intersections.add(grid[r][c]);
+                        continue;
+                    }
 
-                //up, left
-                if (grid[r-1][c].obstacle == false && grid[r][c-1].obstacle == false) {
-                    intersections.add(grid[r][c]);
-                    continue;
-                }
+                    //up, left
+                    if (grid[r-1][c].obstacle == false && grid[r][c-1].obstacle == false) {
+                        intersections.add(grid[r][c]);
+                        continue;
+                    }
 
-                //down left
-                if (grid[r+1][c].obstacle == false && grid[r][c-1].obstacle == false) {
-                    intersections.add(grid[r][c]);
-                    continue;                  
-                }
+                    //down left
+                    if (grid[r+1][c].obstacle == false && grid[r][c-1].obstacle == false) {
+                        intersections.add(grid[r][c]);
+                        continue;                  
+                    }
 
-                //down right
-                if (grid[r+1][c].obstacle == false && grid[r][c+1].obstacle == false) {
-                    intersections.add(grid[r][c]);
+                    //down right
+                    if (grid[r+1][c].obstacle == false && grid[r][c+1].obstacle == false) {
+                        intersections.add(grid[r][c]);
+                    }
                 }
             }
         }
@@ -282,7 +296,7 @@ public class Maze extends JPanel {
 
         for (int r = 0; r < grid.length; r++) {
             for (int c = 0; c < grid[0].length; c++) {
-                if (grid[r][c].obstacle == false && grid[r][c].bigPoint == false) {
+                if (grid[r][c].obstacle == false && grid[r][c].bigPoint == false && grid[r][c].center == false) {
                     grid[r][c].point = true;
                 }
             }
