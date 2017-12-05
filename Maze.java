@@ -262,30 +262,28 @@ public class Maze extends JPanel {
                 //down left
                 if (grid[r+1][c].obstacle == false && grid[r][c-1].obstacle == false) {
                     intersections.add(grid[r][c]);
-                    for (int r = 1; r < grid.length-1; r++ ) {
-                        for (int c = 1; c < grid[0].length-1; c++) {
-                            if (grid[r][c].obstacle)
-                                continue;
-                            boolean[] surrounding = {grid[r+1][c].obstacle,grid[r][c+1].obstacle,grid[r-1][c].obstacle,grid[r][c-1].obstacle};
-                            if (isTurn(surrounding))
-                                intersections.add(grid[r][c]);
-                        }
-                    }        
-                    int num = 0;
-                    int rand = 0;
-                    while (num != 5) {
-                        rand = (int)(Math.random() * intersections.size());
-                        intersections.get(rand).bigPoint = true;
-                        intersections.remove(rand);
-                        num++;
-                    }        
-                    for (int r = 0; r < grid.length; r++) {
-                        for (int c = 0; c < grid[0].length; c++) {
-                            if (grid[r][c].obstacle == false && grid[r][c].bigPoint == false) {
-                                grid[r][c].point = true;
-                            }
-                        }
-                    }
+                    continue;                  
+                }
+
+                //down right
+                if (grid[r+1][c].obstacle == false && grid[r][c+1].obstacle == false) {
+                    intersections.add(grid[r][c]);
+                }
+            }
+        }
+        int num = 0;
+        int rand = 0;
+        while (num != 5) {
+            rand = (int)(Math.random() * intersections.size());
+            intersections.get(rand).bigPoint = true;
+            intersections.remove(rand);
+            num++;
+        }
+
+        for (int r = 0; r < grid.length; r++) {
+            for (int c = 0; c < grid[0].length; c++) {
+                if (grid[r][c].obstacle == false && grid[r][c].bigPoint == false) {
+                    grid[r][c].point = true;
                 }
             }
         }
