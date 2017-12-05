@@ -34,7 +34,7 @@ public class Maze extends JPanel {
             grid[r/2+1][c/2-1].unbreakable = true;
             grid[r/2+1][c/2+1].unbreakable = true;
             recursiveDFSGenerate(1,1);
-            //removeDeadEnds();
+            removeDeadEnds();
             addPoints();
         } 
     }
@@ -173,8 +173,6 @@ public class Maze extends JPanel {
         StdDraw.setYscale(0,700);
         StdDraw.setXscale(0,700);
         drawMap(stuff);
-        removeDeadEnds();
-        drawMap(stuff);
     }
     
     public static void drawMap(Maze stuff){
@@ -190,6 +188,13 @@ public class Maze extends JPanel {
                 StdDraw.filledRectangle(j*20+10,i*20+10,10,10);
                 StdDraw.setPenColor(StdDraw.BLACK);
                 StdDraw.rectangle(j*20+10,i*20+10,10,10);
+                if (stuff.grid[i][j].bigPoint){
+                    StdDraw.setPenColor(StdDraw.RED);
+                    StdDraw.filledCircle(j*20+10, i*20+10,6);
+                }else if (stuff.grid[i][j].point){
+                    StdDraw.setPenColor(StdDraw.YELLOW);
+                    StdDraw.filledCircle(j*20+10, i*20+10,6);
+                }
             }
         }
     }
@@ -225,40 +230,30 @@ public class Maze extends JPanel {
             }
         }
     }
+    
+    public static boolean isTurn(boolean[] stuff){
+        if (countWalls(stuff) != 2)
+            return false;
+        for (int i = 0; i < stuff.length; i++)
+            if (!stuff[(i+stuff.length)%stuff.length] && !stuff[(i+1+stuff.length)%stuff.length])
+                return true;
+        return false;
+    }
 
-    public void addPoints(){
+    public static void addPoints(){
         //loop through the entire Maze
         //place specific amount of "Big Points"
         //the rest are points
         ArrayList <Node> intersections = new ArrayList<Node>();
-        for (int r = 0; r < grid.length; r++ ) {
-            for (int c = 0; c < grid[0].length; c++) {
-                //up, right
-                if (grid[r-1][c].obstacle == false && grid[r][c+1].obstacle == false) {
-                    intersections.add(grid[r][c]);
+        for (int r = 1; r < grid.length-1; r++ ) {
+            for (int c = 1; c < grid[0].length-1; c++) {
+                if (grid[r][c].obstacle)
                     continue;
-                }
-                
-                //up, left
-                if (grid[r-1][c].obstacle == false && grid[r][c-1].obstacle == false) {
+                boolean[] surrounding = {grid[r+1][c].obstacle,grid[r][c+1].obstacle,grid[r-1][c].obstacle,grid[r][c-1].obstacle};
+                if (isTurn(surrounding))
                     intersections.add(grid[r][c]);
-                    continue;
-                }
-                
-                //down left
-                if (grid[r+1][c].obstacle == false && grid[r][c-1].obstacle == false) {
-                    intersections.add(grid[r][c]);
-                    continue;
-                }
-                
-                //down right
-                if (grid[r+1][c].obstacle == false && grid[r][c+1].obstacle == false) {
-                    intersections.add(grid[r][c]);
-                }
-
             }
-        }
-        
+        }        
         int num = 0;
         int rand = 0;
         while (num != 5) {
@@ -266,8 +261,7 @@ public class Maze extends JPanel {
             intersections.get(rand).bigPoint = true;
             intersections.remove(rand);
             num++;
-        }
-        
+        }        
         for (int r = 0; r < grid.length; r++) {
             for (int c = 0; c < grid[0].length; c++) {
                 if (grid[r][c].obstacle == false && grid[r][c].bigPoint == false) {
