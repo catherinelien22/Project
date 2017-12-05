@@ -23,7 +23,6 @@ public class Displayer extends JPanel implements KeyListener
     Ghost blinky, inky, pinky, clyde;
     Ghost[] ghosts;
     BufferedImage[] ghostImages, pacmanImages; //pacmanImages is for the different orientations of pacman
-    BufferedImage wall;
 
     public Displayer(){
         super();
@@ -44,14 +43,13 @@ public class Displayer extends JPanel implements KeyListener
             pacmanImages[1] = ImageIO.read(new File("pacman 1.png"));
             pacmanImages[2] = ImageIO.read(new File("pacman 2.png"));
             pacmanImages[3] = ImageIO.read(new File("pacman 3.png"));
-            wall = ImageIO.read(new File("wall.png"));
         } 
         catch(IOException e) {System.out.println("ERROR");};
         updater = new Timer(40, new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                repaint();
-            }
-        });
+                public void actionPerformed(ActionEvent evt) {
+                    repaint();
+                }
+            });
         updater.start();
         addKeyListener(this);
         requestFocusInWindow();
@@ -107,7 +105,14 @@ public class Displayer extends JPanel implements KeyListener
                 if (world.grid[i][j].obstacle){
                     /*g.setColor(Color.BLUE); //wall color
                     g.fillRect(j*gridSize, i*gridSize, gridSize, gridSize);*/
-                    g.drawImage(wall,j*gridSize,i*gridSize,gridSize,gridSize, null, null);
+                    //g.drawImage(wall,j*gridSize,i*gridSize,gridSize,gridSize, null, null);
+
+                    try {
+                        String fileName = "wall"+generateCode(i,j)+".png";
+                        BufferedImage wallImage = ImageIO.read(new File(fileName));
+                        g.drawImage(wallImage, j*gridSize, i*gridSize, gridSize, gridSize, null, null);
+                    } 
+                    catch(IOException e) {System.out.println("ERROR");};
                 }else if (world.grid[i][j].point){
                     g.setColor(Color.WHITE);
                     g.fillOval(j*gridSize, i*gridSize, pointSize, pointSize);
@@ -122,6 +127,77 @@ public class Displayer extends JPanel implements KeyListener
             g.drawImage(ghostImages[k], ghosts[k].c*gridSize, ghosts[k].r*gridSize, gridSize, gridSize, null, null); 
         }
         g.drawImage(pacmanImages[user.orientation], user.c*gridSize, user.r*gridSize, gridSize, gridSize, null, null);
+    }
+
+    public String generateCode(int r, int c){
+        String ans = "";
+        boolean[] status = new boolean[4];
+        if (outOfBound(r+1,true))
+            status[0] = false;
+        else status[0] = world.grid[r+1][c].obstacle;
+        if (outOfBound(c+1,false))
+            status[1] = false;
+        else status[1] = world.grid[r][c+1].obstacle;
+        if (outOfBound(r-1,true))
+            status[2] = false;
+        else status[2] = world.grid[r-1][c].obstacle;
+        if (outOfBound(c-1,false))
+            status[3] = false;
+        else status[3] = world.grid[r][c-1].obstacle;
+        int num = world.countWalls(status);
+        ans+=num;
+        if (num != 0 || num != 4){
+            ans+=findIndex(num, status);
+        }
+        return ans;
+    }
+
+    public String findIndex(int num, boolean[] status){
+        if (num == 1){
+            return Integer.toString(findFirstTrue(status));
+        }else if (num == 2){
+            if (world.isTurn(status)){
+                return findRightTurnStart(status);
+            }else{
+                return Integer.toString(findFirstTrue(status));
+            }
+        }else if (num == 3){
+            return Integer.toString(findOnlyFalse(status));
+        }
+        return "";
+    }
+    
+    public String findRightTurnStart(boolean[] stuff){
+        for (int i = 0; i < stuff.length; i++)
+            if (!stuff[(i+stuff.length)%stuff.length] && !stuff[(i+1+stuff.length)%stuff.length])
+                return Integer.toString(i)+"t";
+        return "";
+    }
+
+    public int findOnlyFalse(boolean[] status){
+        for (int i = 0; i < status.length; i++)
+            if (status[i] == false)
+                return i;
+        return -1;
+    }
+
+    public int findFirstTrue(boolean[] status){
+        for (int i = 0; i < status.length; i++){
+            if (status[i] == true)
+                return i;
+        }
+        return -1;
+    }
+    
+    public boolean outOfBound(int i, boolean r){
+        if (r){
+            if (i <=world.height-1 && i >=0)
+                return false;
+        }else{
+            if (i <= world.width-1 && i >= 0)
+                return false;
+        }
+        return true;
     }
 
     public void displayGameOver(Graphics g){
