@@ -94,13 +94,10 @@ public class Displayer extends JPanel implements KeyListener
     }
 
     public void displayGame(Graphics g){
-<<<<<<< HEAD
         //top menu for points and lives and time
-=======
         final int gridSize = 20; //these are random numbers
         final int pointSize = 10;
         final int bigPointSize = 15;
->>>>>>> 43c553ed547237503e5b5f6006becf2c967b874e
         for( int i = 0; i < world.grid.length; i++){
             for (int j = 0; j < world.grid[i].length; j++){
                 //add background for all cases
