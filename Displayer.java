@@ -67,6 +67,7 @@ public class Displayer extends JPanel implements KeyListener
     }
 
     public void displayGame(Graphics g){
+        //top menu for points and lives and time
         for( int i = 0; i < world.grid.length; i++){
             for (int j = 0; j < world.grid[i].length; j++){
                 //add background for all cases
@@ -154,19 +155,19 @@ public class Displayer extends JPanel implements KeyListener
             }
         }
     }
-    
-    public void checkGameOver(){
-        if (user.r == pinky.r && user.c == pinky.c){
-            gameover = true;
-        }else if (user.r == inky.r && user.c == inky.c){
-            gameover = true;
-        }else if (user.r == blinky.r && user.c == blinky.c){
-            gameover = true;
-        }else if (user.r == blinky.r && user.c == blinky.c){
-            gameover = true;
+
+    public void checkGhostsStatus(){
+        if ((user.r == pinky.r && user.c == pinky.c)||(user.r == inky.r && user.c == inky.c)||
+        (user.r == blinky.r && user.c == blinky.c)||(user.r == blinky.r && user.c == blinky.c)){
+            //if ghosts are in special mode, ghosts return to mid and get reset to normal mode
+            //else user dies and then if user's life >= 0, reset the ghosts, else gameover
         }
     }
-    
+
+    public void checkVictory(){
+        //something happens
+    }
+
     public void eatPoint(){
         if (world.grid[user.r][user.c].point){
             //add to score
@@ -175,33 +176,34 @@ public class Displayer extends JPanel implements KeyListener
             world.grid[user.r][user.c].bigPoint = false;
         }
     }
-    
+
     public void ghostUpdate(){
         pinky.performSimpleAgentTask();
         inky.performSimpleAgentTask();
         blinky.performSimpleAgentTask();
         clyde.performSimpleAgentTask();
     }
-    
+
     public void updateTimerTask(String type){
         if (type.equals("GAME")){
             updater.stop();
             updater = new Timer(40, new ActionListener() {
-                public void actionPerformed(ActionEvent evt) {
-                    checkGameOver();
-                    eatPoint();
-                    repaint();
-                    ghostUpdate();
-                }
-            });
+                    public void actionPerformed(ActionEvent evt) {
+                        checkGhostsStatus();
+                        eatPoint();
+                        ghostUpdate();
+                        checkVictory();
+                        repaint();
+                    }
+                });
             updater.start();
         }else if (type.equals("")){
             updater.stop();
             updater = new Timer(40, new ActionListener() {
-                public void actionPerformed(ActionEvent evt) {
-                    repaint();
-                }
-            });
+                    public void actionPerformed(ActionEvent evt) {
+                        repaint();
+                    }
+                });
             updater.start();
         }
     }
