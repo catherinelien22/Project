@@ -118,7 +118,8 @@ public class Displayer extends JPanel implements KeyListener
 
     public void displayGame(Graphics g){
         //top menu for points and lives and time
-        final int gridSize =  (int) (frameSize.getHeight() / mazeHeight); 
+        final Dimension fs = GameRunner.frame.getContentPane().getSize();
+        final int gridSize =  (int) (fs.getHeight() / mazeHeight); 
         final int pointSize = 10;
         final int bigPointSize = 15;
         for( int i = 0; i < world.grid.length; i++){
@@ -190,7 +191,7 @@ public class Displayer extends JPanel implements KeyListener
         }
         return "";
     }
-    
+
     public String findRightTurnStart(boolean[] stuff){
         for (int i = 0; i < stuff.length; i++)
             if (!stuff[(i+stuff.length)%stuff.length] && !stuff[(i+1+stuff.length)%stuff.length])
@@ -212,7 +213,7 @@ public class Displayer extends JPanel implements KeyListener
         }
         return -1;
     }
-    
+
     public boolean outOfBound(int i, boolean r){
         if (r){
             if (i <=world.height-1 && i >=0)
