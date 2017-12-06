@@ -9,13 +9,16 @@ public class GameRunner
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Displayer game = new Displayer();
         frame.add(game);
-        frame.setSize(1280,720);
-        //frame.pack();
         frame.setVisible(true);
         frame.setResizable(true);
+        frame.setSize(1280,720);
+        
+        //frame.pack();
+        
         game.setFocusable(true);
         game.requestFocusInWindow();
-        game.menu = false;
-        game.game = true;
+        //game.menu = false; //uncomment to test game graphics
+        //game.game = true; 
+        
     }
 }
