@@ -5,6 +5,8 @@ public class StupidGhost extends Ghost
     public StupidGhost(int a, int b, User user, Maze grid){
         super(a,b,user,grid);
         corner = false;
+        super.startR = mazeWidth / 2 + 1;
+        super.startC = mazeHeight / 2;
     }
 
     @Override

@@ -19,7 +19,7 @@ import java.awt.FontFormatException;
 public class Displayer extends JPanel implements KeyListener
 {
     boolean menu, pause, game, started, gameover;
-    final int mazeWidth = 25, mazeHeight = 19;
+    static final int mazeWidth = 25, mazeHeight = 19;
     int score = 0;
     Timer updater;
     Maze world;
@@ -30,7 +30,7 @@ public class Displayer extends JPanel implements KeyListener
     BufferedImage wall;
     Button[] displayMenuButtons;
     Font currFont;
-    
+
     public Displayer(){
         super();
         menu = true;
@@ -108,7 +108,7 @@ public class Displayer extends JPanel implements KeyListener
         g.fillRect(0, 0, (int) frameSize.getWidth(), (int) frameSize.getHeight());
         final int width = (int)(frameSize.getWidth() / 2);
         final int height = (int)(frameSize.getHeight() / 4);
-        
+
         int buttonX = (int)(frameSize.getWidth() / 2 - width / 2);
         int buttonY = (int)(frameSize.getHeight() / 4 - height / 2);
         try {
@@ -116,7 +116,7 @@ public class Displayer extends JPanel implements KeyListener
             g.drawImage(logo, buttonX, buttonY, width, height, null);
         } catch (IOException e) { System.out.println("logo ERROR"); };
         buttonY += frameSize.getHeight() / 4;
-        
+
         for (int i = 0; i < displayMenuButtons.length; i++) {
             BufferedImage buttonImage = null;
             try {
@@ -332,10 +332,18 @@ public class Displayer extends JPanel implements KeyListener
     }
 
     public void checkGhostsStatus(){
-        if ((user.r == pinky.r && user.c == pinky.c)||(user.r == inky.r && user.c == inky.c)||
-        (user.r == blinky.r && user.c == blinky.c)||(user.r == blinky.r && user.c == blinky.c)){
-            //if ghosts are in special mode, ghosts return to mid and get reset to normal mode
-            //else user dies and then if user's life >= 0, reset the ghosts, else gameover
+        //if ghosts are in special mode, ghosts return to mid and get reset to normal mode
+        //else user dies and then if user's life >= 0, reset the ghosts, else gameover
+        for (int i = 0; i < ghosts.length; i++) {
+            if (user.specialMode) {
+                //ghostImages[i] = ImageIO.read(new File());
+                if (ghosts[i].r == user.r && ghosts[i].c == user.c) {
+                    ghosts[i].dead = true;
+                }
+            } 
+            else if (ghosts[i].r == user.r && ghosts[i].c == user.c && !user.specialMode) {
+                user.die();
+            }
         }
     }
 
@@ -363,9 +371,9 @@ public class Displayer extends JPanel implements KeyListener
     public void updateTimerTask(String type){
         if (type.equals("GAME")){
             updater.stop();
-            updater = new Timer(200, new ActionListener() {
+            updater = new Timer(400, new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
-                        //checkGhostsStatus();
+                        checkGhostsStatus();
                         eatPoint();
                         ghostUpdate();
                         //checkVictory();

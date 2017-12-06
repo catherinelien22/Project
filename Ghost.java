@@ -3,16 +3,20 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 public abstract class Ghost
 {
-    public int r,c;
+    public int r,c,startR,startC;
     public Maze world;
     public User target;
     Timer movement;
+    boolean dead;
+    int mazeWidth = Displayer.mazeWidth;
+    int mazeHeight = Displayer.mazeHeight;
     public Ghost(int a, int b, User user, Maze grid)
     {
         r = b;
         c = a;
         world = grid;
         target = user;
+        dead = false;
     }
 
     public abstract Node sense();
@@ -33,6 +37,12 @@ public abstract class Ghost
             return "LEFT";
         return null;
     }
+    
+    private Node reset() {
+        Node end = world.grid[startR][startC];
+        Node start = world.grid[r][c];
+        return SearchMethod.greedySearch(start, end, world);
+    }
 
     private void act(String command){
         /*
@@ -51,13 +61,11 @@ public abstract class Ghost
     }
 
     public void performSimpleAgentTask(){
-        movement = new Timer(1000, new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                act(decide(sense()));
-                movement.stop();
-            }
-        });
-        movement.start();
+        if (!dead)
+            act(decide(sense()));
+        else if (dead) {
+            act(decide(reset()));
+        }
     }
 
     public Node findAmbushPoint(){
