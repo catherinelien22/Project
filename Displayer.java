@@ -224,6 +224,9 @@ public class Displayer extends JPanel implements KeyListener
             g.drawImage(ghostImages[k], ghosts[k].c*gridSize, ghosts[k].r*gridSize, gridSize, gridSize, null, null); 
         }
         g.drawImage(pacmanImages[user.orientation], user.c*gridSize, user.r*gridSize, gridSize, gridSize, null, null);
+        
+        g.drawString("SCORE", (int)(fs.getWidth() * 0.75), (int)(fs.getHeight() * 0.5));
+        g.drawString(Integer.toString(score), (int)(fs.getWidth() * 0.75), (int)(fs.getHeight() * 0.75));
     }
 
     public String generateCode(int r, int c){
@@ -421,13 +424,18 @@ public class Displayer extends JPanel implements KeyListener
 
     public void checkVictory(){
         //something happens
-        for (int i = 0; i < world.grid.length; i++){
-            for (int j = 0; j < world.grid[i].length; j++){
-                if (world.grid[i][j].point || world.grid[i][j].bigPoint)
-                    return;
+        boolean win = true;
+        for (int r = 0; r < world.grid.length; r++) {
+            for (int c = 0; c < world.grid[0].length; c++) {
+                if (world.grid[r][c].point)
+                    win = false;
             }
         }
-        victory = true;
+        if (win) {
+            game = false;
+            started = false;
+            gameover = true;
+        }
     }
 
     public void eatPoint(){
@@ -456,7 +464,7 @@ public class Displayer extends JPanel implements KeyListener
                         eatPoint();
                         if (updated %10 == 0)
                             ghostUpdate();
-                        //checkVictory();
+                        checkVictory();
                         repaint();
                     }
                 });
