@@ -2,5 +2,5 @@
 comment0.params=a\ b\ user\ grid
 comment0.target=UnpredictableGhost(int,\ int,\ User,\ Maze)
 comment1.params=
-comment1.target=Node\ sense()
+comment1.target=void\ sense()
 numComments=2

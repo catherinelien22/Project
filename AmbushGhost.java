@@ -7,9 +7,11 @@ public class AmbushGhost extends Ghost
     }
 
     @Override
-    public Node sense(){
-        Node end = findAmbushPoint();
-        Node start = world.grid[r][c];
-        return SearchMethod.greedySearch(start, end, world);
+    public void sense(){
+        if (super.route.size()==0){
+            Node end = findAmbushPoint();
+            Node start = world.grid[r][c];
+            route = SearchMethod.greedySearch(start, end, world);
+        }
     }
 }

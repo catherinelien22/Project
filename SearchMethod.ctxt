@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.params=start\ end\ world
-comment0.target=Node\ greedySearch(Node,\ Node,\ Maze)
+comment0.target=java.util.ArrayList\ greedySearch(Node,\ Node,\ Maze)
 comment1.params=world
 comment1.target=void\ reset(Maze)
 comment2.params=child\ list

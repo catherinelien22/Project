@@ -1,6 +1,7 @@
 import javax.swing.Timer;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 public abstract class Ghost
 {
     public int r,c,startR,startC;
@@ -10,6 +11,8 @@ public abstract class Ghost
     boolean dead;
     int mazeWidth = Displayer.mazeWidth;
     int mazeHeight = Displayer.mazeHeight;
+    protected ArrayList<Node> route;
+    
     public Ghost(int a, int b, User user, Maze grid)
     {
         r = b;
@@ -17,14 +20,20 @@ public abstract class Ghost
         world = grid;
         target = user;
         dead = false;
+        route = new ArrayList<Node>();
     }
 
-    public abstract Node sense();
+    public abstract void sense();
 
-    private String decide(Node goal){
+    private String decide(){
         /*
          * preconditoin: the search function does not return diagonal results
          */
+        Node goal = null;
+        if (route.size()>0)
+            goal = route.remove(0);
+        else
+            goal = null;
         if (goal == null)
             return null;
         if (goal.r -r == 1) // if goal is one below
@@ -38,10 +47,12 @@ public abstract class Ghost
         return null;
     }
     
-    public Node reset() {
-        Node end = world.grid[startR][startC];
+    public void reset() {
+        /*Node end = world.grid[startR][startC];
         Node start = world.grid[r][c];
-        return SearchMethod.greedySearch(start, end, world);
+        return SearchMethod.greedySearch(start, end, world);*/
+        r = startR; c = startC;
+        route.clear();
     }
 
     private void act(String command){
@@ -61,12 +72,13 @@ public abstract class Ghost
     }
 
     public void performSimpleAgentTask(){
-        if (!dead)
-            act(decide(sense()));
-        else if (dead) {
+        if (!dead){
+            sense();
+            act(decide());
+        }else if (dead) {
             System.out.println(r + " " + c);
             System.out.println(startR + " " + startC);
-            act(decide(reset()));
+            //act(decide(reset()));
         }
     }
 
