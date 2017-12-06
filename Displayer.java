@@ -68,10 +68,10 @@ public class Displayer extends JPanel implements KeyListener
                 if (!started){
                     world = new Maze(mazeHeight,mazeWidth);
                     user = new User(1,1,0);
-                    ghosts[0] = new ChasingGhost(mazeWidth/2,mazeHeight/2,user, world); //blinky
-                    ghosts[1] = new AmbushGhost(mazeWidth/2,mazeHeight/2+1,user,world); //debug
-                    ghosts[2] = new UnpredictableGhost(mazeWidth - 2, 1,user,world); //debug
-                    ghosts[3] = new StupidGhost(mazeWidth - 2, mazeHeight - 2,user,world); //debug
+                    ghosts[0] = new ChasingGhost(mazeWidth/2-1,mazeHeight/2,user, world); //blinky
+                    ghosts[1] = new AmbushGhost(mazeWidth/2,mazeHeight/2,user,world); //debug
+                    ghosts[2] = new UnpredictableGhost(mazeWidth/2+1, mazeHeight/2,user,world); //debug
+                    ghosts[3] = new StupidGhost(mazeWidth/2, mazeHeight/2+1,user,world); //debug
                     updateTimerTask("GAME");
                     started = true;
                 }else if (started && !gameover){
@@ -128,10 +128,6 @@ public class Displayer extends JPanel implements KeyListener
                 g.setColor(Color.BLACK);
                 g.fillRect(j*gridSize, i*gridSize, gridSize, gridSize);
                 if (world.grid[i][j].obstacle){
-                    /*g.setColor(Color.BLUE); //wall color
-                    g.fillRect(j*gridSize, i*gridSize, gridSize, gridSize);*/
-                    //g.drawImage(wall,j*gridSize,i*gridSize,gridSize,gridSize, null, null);
-
                     try {
                         String fileName = "wall"+generateCode(i,j)+".png";
                         BufferedImage wallImage = ImageIO.read(new File(fileName));
@@ -323,7 +319,7 @@ public class Displayer extends JPanel implements KeyListener
                     public void actionPerformed(ActionEvent evt) {
                         //checkGhostsStatus();
                         //eatPoint();
-                        ghostUpdate();
+                        //ghostUpdate();
                         //checkVictory();
                         repaint();
                     }
