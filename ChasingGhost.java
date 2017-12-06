@@ -2,8 +2,8 @@ public class ChasingGhost extends Ghost
 {    
     public ChasingGhost(int a, int b, User user, Maze grid){
         super(a,b,user, grid);
-        super.startR = mazeWidth / 2 - 1;
-        super.startC = mazeHeight / 2;
+        super.startC = mazeWidth / 2 - 1;
+        super.startR = mazeHeight / 2;
     }
     
     @Override

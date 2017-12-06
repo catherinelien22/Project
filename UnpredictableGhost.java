@@ -9,8 +9,8 @@ public class UnpredictableGhost extends Ghost
     public UnpredictableGhost(int a, int b, User user, Maze grid){
         super(a,b,user,grid);
         mode = 0;   
-        super.startR = mazeWidth / 2;
-        super.startC = mazeHeight / 2 + 1;
+        super.startC = mazeWidth / 2;
+        super.startR = mazeHeight / 2 + 1;
     }
 
     @Override

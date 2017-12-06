@@ -38,7 +38,7 @@ public abstract class Ghost
         return null;
     }
     
-    private Node reset() {
+    public Node reset() {
         Node end = world.grid[startR][startC];
         Node start = world.grid[r][c];
         return SearchMethod.greedySearch(start, end, world);
@@ -64,6 +64,8 @@ public abstract class Ghost
         if (!dead)
             act(decide(sense()));
         else if (dead) {
+            System.out.println(r + " " + c);
+            System.out.println(startR + " " + startC);
             act(decide(reset()));
         }
     }
