@@ -7,9 +7,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 
@@ -24,7 +26,6 @@ public class Displayer extends JPanel implements KeyListener
     Ghost[] ghosts;
     BufferedImage[] ghostImages, pacmanImages; //pacmanImages is for the different orientations of pacman
     BufferedImage wall;
-    final Dimension frameSize = GameRunner.frame.getContentPane().getSize();
     Button[] displayMenuButtons;
     public Displayer(){
         super();
@@ -90,14 +91,21 @@ public class Displayer extends JPanel implements KeyListener
         //background picture
         //"selected" buttons are bigger
         //work in progress
-        g.setColor(Color.GREEN);
+        final Dimension frameSize = GameRunner.frame.getContentPane().getSize();
+        g.setColor(Color.BLACK);
         System.out.println("debug");
-        g.fillRect((int)(frameSize.getWidth() / 2), (int)(frameSize.getHeight() / 2), (int) frameSize.getWidth(), (int) frameSize.getHeight());
+        System.out.println(frameSize.getWidth() + " " +  frameSize.getHeight());
+        g.fillRect(0, 0, (int) frameSize.getWidth(), (int) frameSize.getHeight());
+        final int width = (int)(frameSize.getWidth() / 2);
+        final int height = (int)(frameSize.getHeight() / 4);
         
-        final int buttonWidth = (int) (frameSize.getWidth() / 2);
-        final int buttonHeight = (int) (frameSize.getHeight() / 6);
-        int buttonX = (int)(frameSize.getWidth() / 2);
-        int buttonY = (int)(frameSize.getHeight() / 6);
+        int buttonX = (int)(frameSize.getWidth() / 2 - width / 2);
+        int buttonY = (int)(frameSize.getHeight() / 4 - height / 2);
+        try {
+            BufferedImage logo = ImageIO.read(new File("pacman logo.png"));
+            g.drawImage(logo, buttonX, buttonY, width, height, null);
+        } catch (IOException e) { System.out.println("logo ERROR"); };
+        buttonY += frameSize.getHeight() / 4;
         
         for (int i = 0; i < displayMenuButtons.length; i++) {
             BufferedImage buttonImage = null;
@@ -109,10 +117,10 @@ public class Displayer extends JPanel implements KeyListener
                     buttonImage = ImageIO.read(new File("button.png"));
                 }
             } catch(IOException e) { System.out.println("ERROR"); };
-            g.drawImage(buttonImage, buttonX, buttonY, buttonWidth, buttonHeight, null, null);
-            //g.setFont();
-            //g.setColor();
-            g.drawString(displayMenuButtons[i].name, buttonX, buttonY);
+            g.drawImage(buttonImage, buttonX, buttonY, width, height, null);
+            //g.setFont(new Font(g.getFont().toString(), Font.PLAIN, 32));
+            //g.setColor(); font is ugly
+            //g.drawString(displayMenuButtons[i].name, buttonX + width / 2, buttonY + height / 2);
             buttonY += frameSize.getHeight() / 6;    
         }
 
@@ -246,12 +254,27 @@ public class Displayer extends JPanel implements KeyListener
     public void keyPressed(KeyEvent e){
         if (menu){
             if (e.getKeyCode() == KeyEvent.VK_DOWN){
-                //updateTimerTask();
+                for (Button b : displayMenuButtons) {
+                    b.selected = !b.selected;
+                }
+                updateTimerTask("");
             }else if (e.getKeyCode() == KeyEvent.VK_UP){
-                //updateTimeTask();
+                for (Button b : displayMenuButtons) {
+                    b.selected = !b.selected;
+                }
+                updateTimerTask("");
             }else if (e.getKeyCode() == KeyEvent.VK_ENTER){
-                //game = true;
-                //menu = false;
+                System.out.println("!");
+                for (int i = 0; i < displayMenuButtons.length; i++) {
+                    if (displayMenuButtons[i].selected && i == 0) {
+                        game = true;
+                        menu = false;
+                    }
+                    else if (displayMenuButtons[i].selected && i == 1) {
+                        //quit game
+                        GameRunner.frame.dispatchEvent(new WindowEvent(GameRunner.frame, WindowEvent.WINDOW_CLOSING));
+                    }
+                }
             }
         }else if (game){
             if (pause){
