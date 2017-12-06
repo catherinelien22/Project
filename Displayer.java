@@ -274,7 +274,7 @@ public class Displayer extends JPanel implements KeyListener
                         game = true;
                         menu = false;
                     }
-                    else {
+                    else if (displayMenuButtons[i].selected && i == 1) {
                         //quit game
                         GameRunner.frame.dispatchEvent(new WindowEvent(GameRunner.frame, WindowEvent.WINDOW_CLOSING));
                     }
