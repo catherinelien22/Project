@@ -14,6 +14,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
+import java.awt.FontFormatException;
 
 public class Displayer extends JPanel implements KeyListener
 {
@@ -27,6 +28,8 @@ public class Displayer extends JPanel implements KeyListener
     BufferedImage[] ghostImages, pacmanImages; //pacmanImages is for the different orientations of pacman
     BufferedImage wall;
     Button[] displayMenuButtons;
+    Font currFont;
+    
     public Displayer(){
         super();
         menu = true;
@@ -40,6 +43,12 @@ public class Displayer extends JPanel implements KeyListener
         displayMenuButtons = new Button[2];
         displayMenuButtons[0] = new Button("Start", true);
         displayMenuButtons[1] = new Button("Quit", false);
+        try{
+            currFont = Font.createFont(Font.TRUETYPE_FONT, new File("ARCADECLASSIC.TTF"));
+            currFont = currFont.deriveFont(72f);
+            this.setFont(currFont);
+        }
+        catch(IOException|FontFormatException e){System.out.println("set font failed");}
         try {
             ghostImages[0] = ImageIO.read(new File("blinky file.png"));
             ghostImages[1] = ImageIO.read(new File("pinky file.png"));
@@ -64,7 +73,7 @@ public class Displayer extends JPanel implements KeyListener
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         if (menu){
-            displayMenu(g); //<- this is the code that is suppose to be here
+            displayMenu(g);
         }else if (game){
             if (pause){
                 displayPauseMenu(g);
@@ -72,10 +81,10 @@ public class Displayer extends JPanel implements KeyListener
                 if (!started){
                     world = new Maze(mazeHeight,mazeWidth);
                     user = new User(1,1,0);
-                    ghosts[0] = new ChasingGhost(mazeWidth/2-1,mazeHeight/2,user, world); //blinky
-                    ghosts[1] = new AmbushGhost(mazeWidth/2,mazeHeight/2,user,world); //debug
-                    ghosts[2] = new UnpredictableGhost(mazeWidth/2+1, mazeHeight/2,user,world); //debug
-                    ghosts[3] = new StupidGhost(mazeWidth/2, mazeHeight/2+1,user,world); //debug
+                    ghosts[0] = new ChasingGhost(mazeWidth/2-1,mazeHeight/2,user, world);
+                    ghosts[1] = new AmbushGhost(mazeWidth/2,mazeHeight/2,user,world);
+                    ghosts[2] = new UnpredictableGhost(mazeWidth/2+1, mazeHeight/2,user,world);
+                    ghosts[3] = new StupidGhost(mazeWidth/2, mazeHeight/2+1,user,world);
                     updateTimerTask("GAME");
                     started = true;
                 }else if (started && !gameover){
@@ -129,6 +138,11 @@ public class Displayer extends JPanel implements KeyListener
     public void displayPauseMenu(Graphics g){
         //background picture
         //selected buttons are bigger
+        final Dimension frameSize = GameRunner.frame.getContentPane().getSize();
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, (int) frameSize.getWidth(), (int) frameSize.getHeight());
+        g.setColor(Color.WHITE);
+        g.drawString("PAUSED",(int)frameSize.getWidth()/2,(int)frameSize.getHeight()/3);
     }
 
     public void displayGame(Graphics g){
@@ -237,7 +251,7 @@ public class Displayer extends JPanel implements KeyListener
     }
 
     public void displayGameOver(Graphics g){
-
+        g.drawString("GAMEOVER", 200,200);
     }
 
     @Override
@@ -349,7 +363,7 @@ public class Displayer extends JPanel implements KeyListener
                     public void actionPerformed(ActionEvent evt) {
                         //checkGhostsStatus();
                         //eatPoint();
-                        //ghostUpdate();
+                        ghostUpdate();
                         //checkVictory();
                         repaint();
                     }
