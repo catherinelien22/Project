@@ -1,4 +1,4 @@
 #BlueJ class context
-comment0.params=str
-comment0.target=Button(java.lang.String)
+comment0.params=str\ selected
+comment0.target=Button(java.lang.String,\ boolean)
 numComments=1

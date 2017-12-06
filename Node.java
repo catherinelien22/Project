@@ -5,7 +5,7 @@ public class Node implements Comparable<Node> {
 	//for backtrack
 	public Node parent;
 	//for drawing and searching
-	public boolean obstacle,point,bigPoint,unbreakable;
+	public boolean obstacle,point,bigPoint,unbreakable,center;
 
 	public Node(int a, int b) {
 		r = a;
@@ -15,6 +15,7 @@ public class Node implements Comparable<Node> {
 		point = false;
 		unbreakable = false;
 		bigPoint = false;
+		center = false;
 		f = 0;
 		h = 0;
 	}

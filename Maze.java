@@ -24,6 +24,10 @@ public class Maze extends JPanel {
             grid[r/2][c/2].obstacle = false;
             grid[r/2+1][c/2].obstacle = false;
             grid[r/2+2][c/2].obstacle = false;
+            grid[r/2][c/2-1].center = true;
+            grid[r/2][c/2].center = true;
+            grid[r/2][c/2].center = true;
+            grid[r/2][c/2].center = true;
             grid[r/2][c/2+1].obstacle = false;
             grid[r/2][c/2-1].obstacle = false;
             grid[r/2][c/2-2].unbreakable = true;
@@ -282,7 +286,7 @@ public class Maze extends JPanel {
 
         for (int r = 0; r < grid.length; r++) {
             for (int c = 0; c < grid[0].length; c++) {
-                if (grid[r][c].obstacle == false && grid[r][c].bigPoint == false) {
+                if (grid[r][c].obstacle == false && grid[r][c].bigPoint == false && grid[r][c].center == false  ) {
                     grid[r][c].point = true;
                 }
             }
