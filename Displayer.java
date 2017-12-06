@@ -336,7 +336,9 @@ public class Displayer extends JPanel implements KeyListener
         //else user dies and then if user's life >= 0, reset the ghosts, else gameover
         for (int i = 0; i < ghosts.length; i++) {
             if (user.specialMode) {
-                //ghostImages[i] = ImageIO.read(new File());
+                try {
+                    ghostImages[i] = ImageIO.read(new File("dead ghost.png"));
+                } catch (IOException e) {};
                 if (ghosts[i].r == user.r && ghosts[i].c == user.c) {
                     ghosts[i].dead = true;
                 }
