@@ -64,9 +64,9 @@ public abstract class Ghost
         if (!dead)
             act(decide(sense()));
         else if (dead) {
-            System.out.println(r + " " + c);
-            System.out.println(startR + " " + startC);
             act(decide(reset()));
+            if (r == startR && c == startC)
+                dead = false; //should pause but idk how 
         }
     }
 

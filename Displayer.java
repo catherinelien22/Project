@@ -178,6 +178,9 @@ public class Displayer extends JPanel implements KeyListener
             g.drawImage(ghostImages[k], ghosts[k].c*gridSize, ghosts[k].r*gridSize, gridSize, gridSize, null, null); 
         }
         g.drawImage(pacmanImages[user.orientation], user.c*gridSize, user.r*gridSize, gridSize, gridSize, null, null);
+        
+        g.drawString("SCORE", (int)(fs.getWidth() * 0.75), (int)(fs.getHeight() * 0.5));
+        g.drawString(Integer.toString(score), (int)(fs.getWidth() * 0.75), (int)(fs.getHeight() * 0.75));
     }
 
     public String generateCode(int r, int c){
@@ -307,24 +310,28 @@ public class Displayer extends JPanel implements KeyListener
                 if (started && !gameover){
                     if (e.getKeyCode() == KeyEvent.VK_DOWN){
                         user.orientation = 2;
-                        if (!world.outOfBound(user.r+1,true) && !world.grid[user.r+1][user.c].obstacle)
+                        if (!world.outOfBound(user.r+1,true) && !world.grid[user.r+1][user.c].obstacle) {
                             user.r++;
-                        updateTimerTask("GAME");
+                            updateTimerTask("GAME");
+                        }
                     }else if (e.getKeyCode() == KeyEvent.VK_UP){
                         user.orientation = 0;
-                        if (!world.outOfBound(user.r-1,true) && !world.grid[user.r-1][user.c].obstacle)
+                        if (!world.outOfBound(user.r-1,true) && !world.grid[user.r-1][user.c].obstacle) {
                             user.r--;
-                        updateTimerTask("GAME");
+                            updateTimerTask("GAME");
+                        }
                     }else if (e.getKeyCode() == KeyEvent.VK_RIGHT){
                         user.orientation = 1;
-                        if (!world.outOfBound(user.c+1,false) && !world.grid[user.r][user.c+1].obstacle)
+                        if (!world.outOfBound(user.c+1,false) && !world.grid[user.r][user.c+1].obstacle) {
                             user.c++;
-                        updateTimerTask("GAME");
+                            updateTimerTask("GAME");
+                        }
                     }else if (e.getKeyCode() == KeyEvent.VK_LEFT){
                         user.orientation = 3;
-                        if (!world.outOfBound(user.c-1,false) && !world.grid[user.r][user.c-1].obstacle)
+                        if (!world.outOfBound(user.c-1,false) && !world.grid[user.r][user.c-1].obstacle) {
                             user.c--;
-                        updateTimerTask("GAME");
+                            updateTimerTask("GAME");
+                        }
                     }else if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
                         pause = true;
                         updateTimerTask("GAME");

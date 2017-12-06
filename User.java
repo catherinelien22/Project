@@ -16,6 +16,10 @@ public class User
         life--;
         if ( life >=0)
             resurrect();
+        if (life < 0) {
+            //Displayer.game = false;
+            //Displayer.gameover = true; not static
+        }
     }
     
     public void resurrect(){
