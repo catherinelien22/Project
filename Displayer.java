@@ -25,7 +25,7 @@ public class Displayer extends JPanel implements KeyListener
     BufferedImage[] ghostImages, pacmanImages; //pacmanImages is for the different orientations of pacman
     BufferedImage wall;
     final Dimension frameSize = GameRunner.frame.getContentPane().getSize();
-
+    Button[] displayMenuButtons;
     public Displayer(){
         super();
         menu = true;
@@ -36,6 +36,9 @@ public class Displayer extends JPanel implements KeyListener
         ghosts = new Ghost[4];
         ghostImages = new BufferedImage[4];
         pacmanImages = new BufferedImage[4];
+        displayMenuButtons = new Button[2];
+        displayMenuButtons[0] = new Button("Start", true);
+        displayMenuButtons[1] = new Button("Quit", false);
         try {
             ghostImages[0] = ImageIO.read(new File("blinky file.png"));
             ghostImages[1] = ImageIO.read(new File("pinky file.png"));
@@ -60,7 +63,7 @@ public class Displayer extends JPanel implements KeyListener
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         if (menu){
-            //displayMenu(g); //<- this is the code that is suppose to be here
+            displayMenu(g); //<- this is the code that is suppose to be here
         }else if (game){
             if (pause){
                 displayPauseMenu(g);
@@ -87,27 +90,31 @@ public class Displayer extends JPanel implements KeyListener
         //background picture
         //"selected" buttons are bigger
         //work in progress
-        //         BufferedImage buttonImage;
-        //         final int buttonWidth = ;
-        //         final int buttonHeight = ;
-        //         int buttonX = ;
-        //         int buttonY = ;
-        //         Button startButton = new Button("Start", true);
-        //         Button quitButton = new Button("Quit", false);
-        //         for (int i = 0; i < displayMenuButtons.length; i++) {
-        //             if (displayMenuButtons[i].selected) {
-        //                 buttonImage = new ImageIO(new File("selected button.png")); 
-        //             }
-        //             else {
-        //                 buttonImage = new ImageIO(new File("button.png"));
-        //             }
-        //             g.drawImage(buttonImage, buttonX, buttonY, buttonWidth, buttonHeight, null, null);
-        //             //g.setFont();
-        //             //g.setColor();
-        //             g.drawString(displayMenuButtons[i].text, buttonX, buttonY);
-        //             buttonX += ;
-        //             buttonY += ;    
-        //         }
+        g.setColor(Color.GREEN);
+        System.out.println("debug");
+        g.fillRect((int)(frameSize.getWidth() / 2), (int)(frameSize.getHeight() / 2), (int) frameSize.getWidth(), (int) frameSize.getHeight());
+        
+        final int buttonWidth = (int) (frameSize.getWidth() / 2);
+        final int buttonHeight = (int) (frameSize.getHeight() / 6);
+        int buttonX = (int)(frameSize.getWidth() / 2);
+        int buttonY = (int)(frameSize.getHeight() / 6);
+        
+        for (int i = 0; i < displayMenuButtons.length; i++) {
+            BufferedImage buttonImage = null;
+            try {
+                if (displayMenuButtons[i].selected) {
+                    buttonImage = ImageIO.read(new File("clicked button.png")); 
+                }
+                else {
+                    buttonImage = ImageIO.read(new File("button.png"));
+                }
+            } catch(IOException e) { System.out.println("ERROR"); };
+            g.drawImage(buttonImage, buttonX, buttonY, buttonWidth, buttonHeight, null, null);
+            //g.setFont();
+            //g.setColor();
+            g.drawString(displayMenuButtons[i].name, buttonX, buttonY);
+            buttonY += frameSize.getHeight() / 6;    
+        }
 
     }
 

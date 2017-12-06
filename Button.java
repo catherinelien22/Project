@@ -3,9 +3,9 @@ public class Button
     String name;
     boolean selected;
     
-    public Button(String str)
+    public Button(String str, boolean selected)
     {
         name = str;
-        selected = false;
+        this.selected = selected;
     }
 }
