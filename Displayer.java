@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.Dimension;
@@ -268,8 +269,16 @@ public class Displayer extends JPanel implements KeyListener
                 updateTimerTask("");
             }else if (e.getKeyCode() == KeyEvent.VK_ENTER){
                 System.out.println("!");
-                game = true;
-                menu = false;
+                for (int i = 0; i < displayMenuButtons.length; i++) {
+                    if (displayMenuButtons[i].selected && i == 0) {
+                        game = true;
+                        menu = false;
+                    }
+                    else {
+                        //quit game
+                        GameRunner.frame.dispatchEvent(new WindowEvent(GameRunner.frame, WindowEvent.WINDOW_CLOSING));
+                    }
+                }
             }
         }else if (game){
             if (pause){
