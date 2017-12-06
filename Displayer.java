@@ -20,6 +20,7 @@ public class Displayer extends JPanel implements KeyListener
 {
     boolean menu, pause, game, started, gameover;
     final int mazeWidth = 25, mazeHeight = 19;
+    int score = 0;
     Timer updater;
     Maze world;
     User user;
@@ -345,9 +346,12 @@ public class Displayer extends JPanel implements KeyListener
     public void eatPoint(){
         if (world.grid[user.r][user.c].point){
             //add to score
+            score += 10;
             world.grid[user.r][user.c].point = false;
         }else if (world.grid[user.r][user.c].bigPoint){
+            score += 50;
             world.grid[user.r][user.c].bigPoint = false;
+            user.specialMode = true;
         }
     }
 
@@ -362,7 +366,7 @@ public class Displayer extends JPanel implements KeyListener
             updater = new Timer(200, new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
                         //checkGhostsStatus();
-                        //eatPoint();
+                        eatPoint();
                         ghostUpdate();
                         //checkVictory();
                         repaint();

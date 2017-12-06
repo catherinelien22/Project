@@ -1,9 +1,12 @@
+import javax.swing.Timer;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 public abstract class Ghost
 {
     public int r,c;
     public Maze world;
     public User target;
-
+    Timer movement;
     public Ghost(int a, int b, User user, Maze grid)
     {
         r = b;
@@ -48,7 +51,13 @@ public abstract class Ghost
     }
 
     public void performSimpleAgentTask(){
-        act(decide(sense()));
+        movement = new Timer(1000, new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                act(decide(sense()));
+                movement.stop();
+            }
+        });
+        movement.start();
     }
 
     public Node findAmbushPoint(){
