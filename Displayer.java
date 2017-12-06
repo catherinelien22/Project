@@ -309,20 +309,25 @@ public class Displayer extends JPanel implements KeyListener
                         user.orientation = 2;
                         if (!world.outOfBound(user.r+1,true) && !world.grid[user.r+1][user.c].obstacle)
                             user.r++;
+                        updateTimerTask("GAME");
                     }else if (e.getKeyCode() == KeyEvent.VK_UP){
                         user.orientation = 0;
                         if (!world.outOfBound(user.r-1,true) && !world.grid[user.r-1][user.c].obstacle)
                             user.r--;
+                        updateTimerTask("GAME");
                     }else if (e.getKeyCode() == KeyEvent.VK_RIGHT){
                         user.orientation = 1;
                         if (!world.outOfBound(user.c+1,false) && !world.grid[user.r][user.c+1].obstacle)
                             user.c++;
+                        updateTimerTask("GAME");
                     }else if (e.getKeyCode() == KeyEvent.VK_LEFT){
                         user.orientation = 3;
                         if (!world.outOfBound(user.c-1,false) && !world.grid[user.r][user.c-1].obstacle)
                             user.c--;
+                        updateTimerTask("GAME");
                     }else if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
                         pause = true;
+                        updateTimerTask("GAME");
                         //update Timer Task
                     }
                 }else if (gameover){
@@ -351,6 +356,18 @@ public class Displayer extends JPanel implements KeyListener
 
     public void checkVictory(){
         //something happens
+        boolean win = true;
+        for (int r = 0; r < world.grid.length; r++) {
+            for (int c = 0; c < world.grid[0].length; c++) {
+                if (world.grid[r][c].point)
+                    win = false;
+            }
+        }
+        if (win) {
+            game = false;
+            started = false;
+            gameover = true;
+        }
     }
 
     public void eatPoint(){
@@ -373,12 +390,12 @@ public class Displayer extends JPanel implements KeyListener
     public void updateTimerTask(String type){
         if (type.equals("GAME")){
             updater.stop();
-            updater = new Timer(400, new ActionListener() {
+            updater = new Timer(100, new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
                         checkGhostsStatus();
                         eatPoint();
                         ghostUpdate();
-                        //checkVictory();
+                        checkVictory();
                         repaint();
                     }
                 });
