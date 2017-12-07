@@ -22,7 +22,7 @@ public class Displayer extends JPanel implements KeyListener
     boolean menu, pause, game, started, gameover,victory,resumed,updatedUser;
     static final int mazeWidth = 25, mazeHeight = 19;
     int score = 0;
-    Timer updater;
+    Timer updater, specialModeTimer;
     Maze world;
     User user;
     Ghost blinky, inky, pinky, clyde;
@@ -488,7 +488,11 @@ public class Displayer extends JPanel implements KeyListener
         }else if (world.grid[user.r][user.c].bigPoint){
             score += 50;
             world.grid[user.r][user.c].bigPoint = false;
-            user.specialMode = true;
+            specialModeTimer = new Timer(100, e -> {
+                user.specialMode = true;
+                specialModeTimer.stop();
+            });
+            specialModeTimer.start();
         }
     }
 
@@ -500,11 +504,11 @@ public class Displayer extends JPanel implements KeyListener
     public void updateTimerTask(String type){
         if (type.equals("GAME")){
             updater.stop();
-            updater = new Timer(100, new ActionListener() {
+            updater = new Timer(200, new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
                         checkGhostsStatus();
                         eatPoint();
-                        if (updated %10 == 0)
+                        if (updated % 20 == 0)
                             ghostUpdate();
                         checkVictory();
                         repaint();
