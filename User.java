@@ -8,7 +8,7 @@ public class User
         r= a;
         c = b;
         orientation = o;
-        life = 2;
+        life = 0;
         specialMode = false;
     }
     
@@ -16,9 +16,11 @@ public class User
         life--;
         if ( life >=0)
             resurrect();
-        if (life < 0) {
-            //Displayer.game = false;
-            //Displayer.gameover = true; not static
+        if (life < 0) { 
+            Displayer.game = false;
+            Displayer.started = false;
+            Displayer.gameover = true; 
+            System.out.println("IM dead");
         }
     }
     
