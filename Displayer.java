@@ -214,10 +214,10 @@ public class Displayer extends JPanel implements KeyListener
                     g.fillRect(j*gridSize, i*gridSize, gridSize, gridSize);
                     if (world.grid[i][j].point){
                         g.setColor(Color.WHITE);
-                        g.fillOval(j*gridSize, i, pointSize, pointSize);
+                        g.fillOval(j*gridSize+gridSize/2, i*gridSize+gridSize/2, pointSize, pointSize);
                     }else if (world.grid[i][j].bigPoint){
                         g.setColor(Color.YELLOW);
-                        g.fillOval(j*gridSize, i, bigPointSize, bigPointSize);
+                        g.fillOval(j*gridSize+gridSize/2, i*gridSize+gridSize/2, bigPointSize, bigPointSize);
                     }
                 }
             }
