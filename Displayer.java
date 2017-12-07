@@ -23,7 +23,7 @@ public class Displayer extends JPanel implements KeyListener
     static boolean menu, pause, game, started, gameover,victory,resumed,updatedUser;
     static final int mazeWidth = 25, mazeHeight = 19;
     int score = 0;
-    Timer updater, specialModeTimer;
+    Timer updater;
     Maze world;
     User user;
     Ghost blinky, inky, pinky, clyde;
@@ -68,14 +68,10 @@ public class Displayer extends JPanel implements KeyListener
         }
         catch(IOException|FontFormatException e){System.out.println("set font failed");}
         try {
-            ghostImages[0] = ImageIO.read(new File("blinky file.png"));
-            ghostImages[1] = ImageIO.read(new File("pinky file.png"));
-            ghostImages[2] = ImageIO.read(new File("inky file.png"));
-            ghostImages[3] = ImageIO.read(new File("clyde file.png"));
-            pacmanImages[0] = ImageIO.read(new File("pacman 0.png"));
-            pacmanImages[1] = ImageIO.read(new File("pacman 1.png"));
-            pacmanImages[2] = ImageIO.read(new File("pacman 2.png"));
-            pacmanImages[3] = ImageIO.read(new File("pacman 3.png"));
+            for (int i = 0; i < 4; i++){
+                ghostImages[i] = ImageIO.read(new File("ghost"+Integer.toString(i)+".png"));
+                pacmanImages[i] = ImageIO.read(new File("pacman"+Integer.toString(i)+".png"));
+            }
             pointer = ImageIO.read(new File("pointer.png"));
         } 
         catch(IOException e) {System.out.println("ERROR");};
@@ -91,6 +87,7 @@ public class Displayer extends JPanel implements KeyListener
 
     public void paintComponent(Graphics g){
         //super.paintComponent(g);
+        updated++;
         if (menu){
             super.paintComponent(g);
             displayMenu(g);
@@ -206,29 +203,29 @@ public class Displayer extends JPanel implements KeyListener
                 }
             }else{
                 if (started && !gameover){
-                    if(updated %4 == 0){
-                        if (e.getKeyCode() == KeyEvent.VK_DOWN){
-                            if (!world.outOfBound(user.r+1,true) && !world.grid[user.r+1][user.c].obstacle){
-                                resetDirection();
-                                direction[2] = true;
-                            }
-                        }else if (e.getKeyCode() == KeyEvent.VK_UP){
-                            if (!world.outOfBound(user.r-1,true) && !world.grid[user.r-1][user.c].obstacle){
-                                resetDirection();
-                                direction[0] = true;
-                            }
-                        }else if (e.getKeyCode() == KeyEvent.VK_RIGHT){
-                            if (!world.outOfBound(user.c+1,false) && !world.grid[user.r][user.c+1].obstacle){
-                                resetDirection();
-                                direction[1] = true;
-                            }
-                        }else if (e.getKeyCode() == KeyEvent.VK_LEFT){
-                            if (!world.outOfBound(user.c-1,false) && !world.grid[user.r][user.c-1].obstacle){
-                                resetDirection();
-                                direction[3] = true;
-                            }
+                    //if(updated %4 == 0){
+                    if (e.getKeyCode() == KeyEvent.VK_DOWN){
+                        if (!world.outOfBound(user.r+1,true) && !world.grid[user.r+1][user.c].obstacle){
+                            resetDirection();
+                            direction[2] = true;
+                        }
+                    }else if (e.getKeyCode() == KeyEvent.VK_UP){
+                        if (!world.outOfBound(user.r-1,true) && !world.grid[user.r-1][user.c].obstacle){
+                            resetDirection();
+                            direction[0] = true;
+                        }
+                    }else if (e.getKeyCode() == KeyEvent.VK_RIGHT){
+                        if (!world.outOfBound(user.c+1,false) && !world.grid[user.r][user.c+1].obstacle){
+                            resetDirection();
+                            direction[1] = true;
+                        }
+                    }else if (e.getKeyCode() == KeyEvent.VK_LEFT){
+                        if (!world.outOfBound(user.c-1,false) && !world.grid[user.r][user.c-1].obstacle){
+                            resetDirection();
+                            direction[3] = true;
                         }
                     }
+                    //}
                     if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
                         pause = true;
                         updateTimerTask("");
@@ -483,16 +480,20 @@ public class Displayer extends JPanel implements KeyListener
         //if ghosts are in special mode, ghosts return to mid and get reset to normal mode
         //else user dies and then if user's life >= 0, reset the ghosts, else gameover
         for (int i = 0; i < ghosts.length; i++) {
-            if (user.specialMode) {
+            if (ghosts[i].scaredMode) {
                 try {
                     ghostImages[i] = ImageIO.read(new File("dead ghost.png"));
                 } catch (IOException e) {};
                 if (ghosts[i].r == user.r && ghosts[i].c == user.c) {
                     ghosts[i].dead = true;
-                    ghosts[i].timeUntilRevive = 8;
+                    ghosts[i].timeUntilRevive = 3;
                 }
-            } 
-            else if (ghosts[i].r == user.r && ghosts[i].c == user.c && !user.specialMode) {
+            } else if (!ghosts[i].scaredMode){
+                try {
+                    ghostImages[i] = ImageIO.read(new File("ghost" + Integer.toString(i)+".png"));
+                } catch (IOException e) {};
+            }
+            if (ghosts[i].r == user.r && ghosts[i].c == user.c && !ghosts[i].scaredMode) {
                 user.die();
                 break;
             }
@@ -508,7 +509,7 @@ public class Displayer extends JPanel implements KeyListener
         boolean win = true;
         for (int r = 0; r < world.grid.length; r++) {
             for (int c = 0; c < world.grid[0].length; c++) {
-                if (world.grid[r][c].bigPoint/*should be point*/)
+                if (world.grid[r][c].point)
                     win = false;
             }
         }
@@ -546,7 +547,6 @@ public class Displayer extends JPanel implements KeyListener
     public void checkUserStatus(){
         if (superRoundsLeft >0) superRoundsLeft--;
         else{
-            user.specialMode = false;
             try {
                 ghostImages[0] = ImageIO.read(new File("blinky file.png"));
                 ghostImages[1] = ImageIO.read(new File("pinky file.png"));

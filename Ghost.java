@@ -7,7 +7,6 @@ public abstract class Ghost
     public int r,c,startR,startC;
     public Maze world;
     public User target;
-    Timer movement;
     boolean dead;
     int mazeWidth = Displayer.mazeWidth;
     int mazeHeight = Displayer.mazeHeight;
@@ -21,7 +20,7 @@ public abstract class Ghost
         world = grid;
         target = user;
         dead = false;
-        updateRate = 20;
+        updateRate = 2;
         scaredMode = false;
     }
 
@@ -33,7 +32,7 @@ public abstract class Ghost
          */
         if (goal == null)
             return null;
-        if(!target.specialMode){
+        if(!scaredMode){
             if (goal.r -r == 1) // if goal is one below
                 return "DOWN";
             else if (goal.c-c == 1) // if goal one to the right
@@ -101,15 +100,16 @@ public abstract class Ghost
 
     public void performSimpleAgentTask(){
         if (scaredMode){
-            updateRate = 60;
+            updateRate = 3;
         }else
-            updateRate = 20;
+            updateRate = 2;
         if (!dead){
             act(decide(sense()));
         }else if (dead) {
             reset();
             if (timeUntilRevive-- == 0){
                 dead = false;
+                scaredMode = false;
             }
         }
     }

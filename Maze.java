@@ -251,6 +251,8 @@ public class Maze extends JPanel {
         ArrayList <Node> intersections = new ArrayList<Node>();
         for (int r = 1; r < grid.length-1; r++ ) {
             for (int c = 1; c < grid[0].length-1; c++) {
+                if (r == c && c == 1)
+                    continue;
                 if (grid[r][c].obstacle)
                     continue;
                 boolean[] surrounding = {grid[r+1][c].obstacle,grid[r][c+1].obstacle,grid[r-1][c].obstacle,grid[r][c-1].obstacle};
