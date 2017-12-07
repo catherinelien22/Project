@@ -19,7 +19,7 @@ import java.awt.FontMetrics;
 
 public class Displayer extends JPanel implements KeyListener
 {
-    boolean menu, pause, game, started, gameover,victory,resumed,updatedUser;
+    static boolean menu, pause, game, started, gameover,victory,resumed,updatedUser;
     static final int mazeWidth = 25, mazeHeight = 19;
     int score = 0;
     Timer updater, specialModeTimer;
@@ -122,6 +122,7 @@ public class Displayer extends JPanel implements KeyListener
         }
     }
 
+
     public void displayMenu(Graphics g){
         //background picture
         final Dimension frameSize = GameRunner.frame.getContentPane().getSize();
@@ -198,6 +199,8 @@ public class Displayer extends JPanel implements KeyListener
                 }
             }
         }
+        g.drawString("SCORE", (int)(fs.getWidth() * 0.75), (int)(fs.getHeight() * 0.5));
+        g.drawString(Integer.toString(score), (int)(fs.getWidth() * 0.75), (int)(fs.getHeight() * 0.75));
     }
 
     public void displayGame(Graphics g){
@@ -227,6 +230,7 @@ public class Displayer extends JPanel implements KeyListener
             g.drawImage(ghostImages[k], ghosts[k].c*gridSize, ghosts[k].r*gridSize, gridSize, gridSize, null, null); 
         }
         g.drawImage(pacmanImages[user.orientation], user.c*gridSize, user.r*gridSize, gridSize, gridSize, null, null);
+
 
         g.drawString("SCORE", (int)(fs.getWidth() * 0.75), (int)(fs.getHeight() * 0.5));
         g.drawString(Integer.toString(score), (int)(fs.getWidth() * 0.75), (int)(fs.getHeight() * 0.75));
