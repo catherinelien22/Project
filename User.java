@@ -17,9 +17,7 @@ public class User
         if ( life >=0)
             resurrect();
         if (life < 0) { 
-            Displayer.started = false;
             Displayer.gameover = true; 
-            System.out.println("IM dead");
         }
     }
     

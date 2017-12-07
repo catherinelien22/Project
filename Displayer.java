@@ -186,9 +186,6 @@ public class Displayer extends JPanel implements KeyListener
         final int bigPointSize = 15;
         for( int i = 0; i < world.grid.length; i++){
             for (int j = 0; j < world.grid[i].length; j++){
-                //add background for all cases
-                /*g.setColor(Color.BLACK);
-                g.fillRect(j*gridSize, i*gridSize, gridSize, gridSize);*/
                 if (world.grid[i][j].obstacle){
                     try {
                         String fileName = "wall"+generateCode(i,j)+".png";
@@ -312,8 +309,8 @@ public class Displayer extends JPanel implements KeyListener
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, (int) frameSize.getWidth(), (int) frameSize.getHeight());
         g.setColor(Color.YELLOW);
-        drawCenteredString(g,"GAME OVER",(int)frameSize.getWidth()/2,(int)frameSize.getHeight()/5);
-        int buttonY = (int)frameSize.getHeight()/4;
+        drawCenteredString(g,"GAME OVER",(int)frameSize.getWidth()/2,(int)frameSize.getHeight()/4);
+        int buttonY = (int)frameSize.getHeight()/2;
         for (int i = 0; i < gameOverMenuButtons.length; i++) {
             g.setColor(Color.WHITE);
             drawCenteredString(g,gameOverMenuButtons[i].name,(int)(frameSize.getWidth()/2),buttonY);
@@ -423,7 +420,7 @@ public class Displayer extends JPanel implements KeyListener
                     }
                 }else if (gameover){
                     if (e.getKeyCode() == KeyEvent.VK_DOWN||e.getKeyCode() == KeyEvent.VK_UP){
-                        for (Button b : displayMenuButtons) {
+                        for (Button b : gameOverMenuButtons) {
                             b.selected = !b.selected;
                         }
                         updateTimerTask("");

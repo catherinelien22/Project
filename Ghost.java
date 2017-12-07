@@ -78,6 +78,8 @@ public abstract class Ghost
         }else if (dead) {
             System.out.println(r + " " + c);
             System.out.println(startR + " " + startC);
+            reset();
+            dead = false;
             //act(decide(reset()));
         }
     }
