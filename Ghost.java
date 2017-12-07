@@ -11,8 +11,9 @@ public abstract class Ghost
     boolean dead;
     int mazeWidth = Displayer.mazeWidth;
     int mazeHeight = Displayer.mazeHeight;
-    protected ArrayList<Node> route;
-    
+    static int timeUntilRevive,updateRate;
+    public boolean scaredMode;
+
     public Ghost(int a, int b, User user, Maze grid)
     {
         r = b;
@@ -20,39 +21,66 @@ public abstract class Ghost
         world = grid;
         target = user;
         dead = false;
-        route = new ArrayList<Node>();
+        updateRate = 20;
+        scaredMode = false;
     }
 
-    public abstract void sense();
+    public abstract Node sense();
 
-    private String decide(){
+    private String decide(Node goal){
         /*
          * preconditoin: the search function does not return diagonal results
          */
-        Node goal = null;
-        if (route.size()>0)
-            goal = route.remove(0);
-        else
-            goal = null;
         if (goal == null)
             return null;
-        if (goal.r -r == 1) // if goal is one below
-            return "DOWN";
-        else if (goal.c-c == 1) // if goal one to the right
-            return "RIGHT";
-        else if (goal.r-r == -1) // if goal one above
-            return "UP";
-        else if (goal.c-c == -1) // if goal one to the left
-            return "LEFT";
+        if(!target.specialMode){
+            if (goal.r -r == 1) // if goal is one below
+                return "DOWN";
+            else if (goal.c-c == 1) // if goal one to the right
+                return "RIGHT";
+            else if (goal.r-r == -1) // if goal one above
+                return "UP";
+            else if (goal.c-c == -1){ // if goal one to the left
+                return "LEFT";
+            }
+        }else{
+            String[] choices = {"DOWN","RIGHT","UP","LEFT"};
+            String code = "";
+            if (goal.r -r == 1){ // if goal is one below
+                code = "DOWN";
+            }else if (goal.c-c == 1){ // if goal one to the right
+                code = "RIGHT";
+            }else if (goal.r-r == -1){ // if goal one above
+                code = "UP";
+            }else if (goal.c-c == -1){ // if goal one to the left
+                code = "LEFT";
+            }
+            String ans = code;
+            boolean[] status = {world.grid[r+1][c].obstacle,world.grid[r][c+1].obstacle,world.grid[r-1][c].obstacle,world.grid[r][c-1].obstacle};
+            int blockedSides = Maze.countWalls(status);
+            while((ans.equals(code) || getNode(ans,r,c).obstacle) && blockedSides!= 3){
+                ans = choices[(int)(Math.random()*choices.length)];
+            }
+            return ans;
+        }
         return null;
     }
     
+    public Node getNode(String dir, int r, int c){
+        if (dir.equals("UP"))
+            return world.grid[r-1][c];
+        else if (dir.equals("DOWN"))
+            return world.grid[r+1][c];
+        else if (dir.equals("RIGHT"))
+            return world.grid[ r][ c+1];
+        else if (dir.equals("LEFT"))
+            return world.grid[ r][ c-1];
+        return null;
+    }
+
     public void reset() {
-        /*Node end = world.grid[startR][startC];
-        Node start = world.grid[r][c];
-        return SearchMethod.greedySearch(start, end, world);*/
         r = startR; c = startC;
-        route.clear();
+        scaredMode = false;
     }
 
     private void act(String command){
@@ -72,15 +100,17 @@ public abstract class Ghost
     }
 
     public void performSimpleAgentTask(){
+        if (scaredMode){
+            updateRate = 60;
+        }else
+            updateRate = 20;
         if (!dead){
-            sense();
-            act(decide());
+            act(decide(sense()));
         }else if (dead) {
-            System.out.println(r + " " + c);
-            System.out.println(startR + " " + startC);
             reset();
-            dead = false;
-            //act(decide(reset()));
+            if (timeUntilRevive-- == 0){
+                dead = false;
+            }
         }
     }
 

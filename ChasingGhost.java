@@ -7,11 +7,9 @@ public class ChasingGhost extends Ghost
     }
 
     @Override
-    public void sense(){
-        if (super.route.size()==0){
-            Node end = world.grid[target.r][target.c];
-            Node start = world.grid[r][c];
-            route = SearchMethod.greedySearch(start, end, world);
-        }
+    public Node sense(){
+        Node end = world.grid[target.r][target.c];
+        Node start = world.grid[r][c];
+        return SearchMethod.greedySearch(start, end, world);
     }
 }

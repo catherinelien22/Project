@@ -3,8 +3,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class SearchMethod{
-    //does the searching and the animation
-    public static ArrayList<Node> greedySearch(Node start, Node end, Maze world) {
+    public static Node greedySearch(Node start, Node end, Maze world) {
         PriorityQueue<Node> queue = new PriorityQueue<Node>();
         ArrayList<Node> visited = new ArrayList<Node>();
         start.h = start.getDist(end);
@@ -15,9 +14,13 @@ public class SearchMethod{
             if (q.equals(end)) {
                 ArrayList<Node> list = new ArrayList<>();
                 list = backTrack(q, list);
+                list.add(0, q);
                 Collections.reverse(list);
                 reset(world);
-                return list;
+                if (list.size() > 1)
+                    return list.get(1);
+                else
+                    return list.get(0);
             }
             visited.add(q);
             // all the neighbors
@@ -61,7 +64,7 @@ public class SearchMethod{
     }
 
     //backtrack for the solution
-    public static ArrayList<Node> backTrack(Node child, ArrayList<Node> list) {
+    public static ArrayList backTrack(Node child, ArrayList list) {
         if (child.parent == null) {
             return list;
         } else {
@@ -70,5 +73,4 @@ public class SearchMethod{
             return backTrack(child.parent, ans);
         }
     }
-
 }

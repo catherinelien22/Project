@@ -16,9 +16,6 @@ public class User
         life--;
         if ( life >=0)
             resurrect();
-        if (life < 0) { 
-            Displayer.gameover = true; 
-        }
     }
     
     public void resurrect(){

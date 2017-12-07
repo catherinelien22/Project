@@ -19,6 +19,7 @@ import java.awt.FontMetrics;
 
 public class Displayer extends JPanel implements KeyListener
 {
+    boolean[] direction = new boolean[4];
     static boolean menu, pause, game, started, gameover,victory,resumed,updatedUser;
     static final int mazeWidth = 25, mazeHeight = 19;
     int score = 0;
@@ -32,7 +33,7 @@ public class Displayer extends JPanel implements KeyListener
     Button[] displayMenuButtons,pauseMenuButtons,gameOverMenuButtons;
     Font currFont;
     FontMetrics metrics;
-    int updated;
+    int updated, superRoundsLeft;
 
     public Displayer(){
         super();
@@ -43,6 +44,7 @@ public class Displayer extends JPanel implements KeyListener
         gameover = false;
         resumed = false;
         updatedUser = false;
+        victory = false;
         ghosts = new Ghost[4];
         ghostImages = new BufferedImage[4];
         pacmanImages = new BufferedImage[4];
@@ -56,7 +58,8 @@ public class Displayer extends JPanel implements KeyListener
         pauseMenuButtons[2] = new Button("To Menu", false);
         gameOverMenuButtons[0] = new Button("New Game", true);
         gameOverMenuButtons[1] = new Button("Menu", false);
-        int updated = 0;
+        updated = 0;
+        superRoundsLeft = 0;
         try{
             currFont = Font.createFont(Font.TRUETYPE_FONT, new File("ARCADECLASSIC.TTF"));
             currFont = currFont.deriveFont(72f);
@@ -122,6 +125,166 @@ public class Displayer extends JPanel implements KeyListener
         }
     }
 
+    public void displayGameOver(Graphics g){
+        final Dimension frameSize = GameRunner.frame.getContentPane().getSize();
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, (int) frameSize.getWidth(), (int) frameSize.getHeight());
+        g.setColor(Color.YELLOW);
+        if (!victory)
+            drawCenteredString(g,"GAME OVER",(int)frameSize.getWidth()/2,(int)frameSize.getHeight()/4);
+        else
+            drawCenteredString(g,"VICTORY", (int)frameSize.getWidth()/2,(int)frameSize.getHeight()/4);
+        int buttonY = (int)frameSize.getHeight()/2;
+        for (int i = 0; i < gameOverMenuButtons.length; i++) {
+            g.setColor(Color.WHITE);
+            drawCenteredString(g,gameOverMenuButtons[i].name,(int)(frameSize.getWidth()/2),buttonY);
+            if(gameOverMenuButtons[i].selected){
+                int pointX = determinePointerLocation(gameOverMenuButtons[i].name,(int)(frameSize.getWidth()/2));
+                /*int pointHeight = determinePointerHeight(displayMenuButtons[i].name);*/
+                int stringHeight = metrics.getHeight();
+                g.drawImage(pointer,pointX,buttonY-stringHeight,stringHeight/2,stringHeight,null, null);
+            }
+            buttonY += (int)frameSize.getHeight()/4;
+        }
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e){
+        if (menu){
+            if (e.getKeyCode() == KeyEvent.VK_DOWN||e.getKeyCode() == KeyEvent.VK_UP){
+                for (Button b : displayMenuButtons) {
+                    b.selected = !b.selected;
+                }
+                updateTimerTask("");
+            }else if (e.getKeyCode() == KeyEvent.VK_ENTER){
+                for (int i = 0; i < displayMenuButtons.length; i++) {
+                    if (displayMenuButtons[i].selected && i == 0) {
+                        game = true;
+                        menu = false;
+                    }
+                    else if (displayMenuButtons[i].selected && i == 1) {
+                        //quit game
+                        GameRunner.frame.dispatchEvent(new WindowEvent(GameRunner.frame, WindowEvent.WINDOW_CLOSING));
+                    }
+                }
+            }
+        }else if (game){
+            if (pause){
+                if (e.getKeyCode() == KeyEvent.VK_DOWN){
+                    for (int i = 0;  i< pauseMenuButtons.length; i++){
+                        if (pauseMenuButtons[i].selected){
+                            pauseMenuButtons[i].selected = false;
+                            pauseMenuButtons[(i+1)%pauseMenuButtons.length].selected = true;
+                            break;
+                        }
+                    }
+                }else if (e.getKeyCode() == KeyEvent.VK_UP){
+                    for (int i = pauseMenuButtons.length-1;  i>=0; i--){
+                        if (pauseMenuButtons[i].selected){
+                            pauseMenuButtons[i].selected = false;
+                            pauseMenuButtons[(i-1+pauseMenuButtons.length)%pauseMenuButtons.length].selected = true;
+                            break;
+                        }
+                    }
+                }else if (e.getKeyCode() == KeyEvent.VK_ENTER){
+                    if (pauseMenuButtons[0].selected){
+                        pause = false;
+                        resumed = true;
+                    }else if (pauseMenuButtons[1].selected){
+                        pause = false;
+                        started = false;
+                    }else if (pauseMenuButtons[2].selected){
+                        game = false;
+                        started = false;
+                        pause = false;
+                        menu = true;
+                    }
+                }else if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
+                    pause = false;
+                    resumed = true;
+                    updateTimerTask("GAME");
+                }
+            }else{
+                if (started && !gameover){
+                    if(updated %4 == 0){
+                        if (e.getKeyCode() == KeyEvent.VK_DOWN){
+                            if (!world.outOfBound(user.r+1,true) && !world.grid[user.r+1][user.c].obstacle){
+                                resetDirection();
+                                direction[2] = true;
+                            }
+                        }else if (e.getKeyCode() == KeyEvent.VK_UP){
+                            if (!world.outOfBound(user.r-1,true) && !world.grid[user.r-1][user.c].obstacle){
+                                resetDirection();
+                                direction[0] = true;
+                            }
+                        }else if (e.getKeyCode() == KeyEvent.VK_RIGHT){
+                            if (!world.outOfBound(user.c+1,false) && !world.grid[user.r][user.c+1].obstacle){
+                                resetDirection();
+                                direction[1] = true;
+                            }
+                        }else if (e.getKeyCode() == KeyEvent.VK_LEFT){
+                            if (!world.outOfBound(user.c-1,false) && !world.grid[user.r][user.c-1].obstacle){
+                                resetDirection();
+                                direction[3] = true;
+                            }
+                        }
+                    }
+                    if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
+                        pause = true;
+                        updateTimerTask("");
+                    }
+                }else if (gameover){
+                    if (e.getKeyCode() == KeyEvent.VK_DOWN||e.getKeyCode() == KeyEvent.VK_UP){
+                        for (Button b : gameOverMenuButtons) {
+                            b.selected = !b.selected;
+                        }
+                        updateTimerTask("");
+                    }else if (e.getKeyCode() == KeyEvent.VK_ENTER){
+                        for (int i = 0; i < gameOverMenuButtons.length; i++) {
+                            if (gameOverMenuButtons[i].selected && i == 0) {
+                                menu = false;
+                                pause = false;
+                                game = true;
+                                started = false;
+                                gameover = false;
+                                resumed = false;
+                                updatedUser = false;
+                                victory = false;
+                                break;
+                            }
+                            else if (gameOverMenuButtons[i].selected && i == 1) {
+                                //back to menu
+                                menu = true;
+                                pause = false;
+                                game = false;
+                                started = false;
+                                gameover = false;
+                                resumed = false;
+                                updatedUser = false;
+                                victory = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e){
+
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e){
+
+    }
+
+    private void resetDirection(){
+        for (int i = 0; i < direction.length; i++)
+            direction[i] = false;
+    }
 
     public void displayMenu(Graphics g){
         //background picture
@@ -226,11 +389,23 @@ public class Displayer extends JPanel implements KeyListener
         for (int k = 0; k < ghosts.length; k++) {
             g.drawImage(ghostImages[k], ghosts[k].c*gridSize, ghosts[k].r*gridSize, gridSize, gridSize, null, null); 
         }
+        if(direction[0] && !world.outOfBound(user.r-1,false) && !world.grid[user.r-1][user.c].obstacle){
+            user.orientation = 0;
+            user.r--;
+        }else if(direction[1] && !world.outOfBound(user.c+1,false) && !world.grid[user.r][user.c+1].obstacle){
+            user.orientation = 1;
+            user.c++;
+        }else if(direction[2] && !world.outOfBound(user.r+1,false) && !world.grid[user.r+1][user.c].obstacle){
+            user.orientation = 2;
+            user.r++;
+        }else if(direction[3] && !world.outOfBound(user.c-1,false) && !world.grid[user.r][user.c-1].obstacle){
+            user.orientation = 3;
+            user.c--;
+        }
         g.drawImage(pacmanImages[user.orientation], user.c*gridSize, user.r*gridSize, gridSize, gridSize, null, null);
 
-
-        g.drawString("SCORE", (int)(fs.getWidth() * 0.75), (int)(fs.getHeight() * 0.5));
-        g.drawString(Integer.toString(score), (int)(fs.getWidth() * 0.75), (int)(fs.getHeight() * 0.75));
+        //g.drawString("SCORE", (int)(fs.getWidth() * 0.75), (int)(fs.getHeight() * 0.5));
+        //g.drawString(Integer.toString(score), (int)(fs.getWidth() * 0.75), (int)(fs.getHeight() * 0.75));
     }
 
     public String generateCode(int r, int c){
@@ -304,149 +479,6 @@ public class Displayer extends JPanel implements KeyListener
         return true;
     }
 
-    public void displayGameOver(Graphics g){
-        final Dimension frameSize = GameRunner.frame.getContentPane().getSize();
-        g.setColor(Color.BLACK);
-        g.fillRect(0, 0, (int) frameSize.getWidth(), (int) frameSize.getHeight());
-        g.setColor(Color.YELLOW);
-        drawCenteredString(g,"GAME OVER",(int)frameSize.getWidth()/2,(int)frameSize.getHeight()/4);
-        int buttonY = (int)frameSize.getHeight()/2;
-        for (int i = 0; i < gameOverMenuButtons.length; i++) {
-            g.setColor(Color.WHITE);
-            drawCenteredString(g,gameOverMenuButtons[i].name,(int)(frameSize.getWidth()/2),buttonY);
-            if(gameOverMenuButtons[i].selected){
-                int pointX = determinePointerLocation(gameOverMenuButtons[i].name,(int)(frameSize.getWidth()/2));
-                /*int pointHeight = determinePointerHeight(displayMenuButtons[i].name);*/
-                int stringHeight = metrics.getHeight();
-                g.drawImage(pointer,pointX,buttonY-stringHeight,stringHeight/2,stringHeight,null, null);
-            }
-            buttonY += (int)frameSize.getHeight()/4;
-        }
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e){
-
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e){
-
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e){
-        if (menu){
-            if (e.getKeyCode() == KeyEvent.VK_DOWN||e.getKeyCode() == KeyEvent.VK_UP){
-                for (Button b : displayMenuButtons) {
-                    b.selected = !b.selected;
-                }
-                updateTimerTask("");
-            }else if (e.getKeyCode() == KeyEvent.VK_ENTER){
-                for (int i = 0; i < displayMenuButtons.length; i++) {
-                    if (displayMenuButtons[i].selected && i == 0) {
-                        game = true;
-                        menu = false;
-                    }
-                    else if (displayMenuButtons[i].selected && i == 1) {
-                        //quit game
-                        GameRunner.frame.dispatchEvent(new WindowEvent(GameRunner.frame, WindowEvent.WINDOW_CLOSING));
-                    }
-                }
-            }
-        }else if (game){
-            if (pause){
-                if (e.getKeyCode() == KeyEvent.VK_DOWN){
-                    for (int i = 0;  i< pauseMenuButtons.length; i++){
-                        if (pauseMenuButtons[i].selected){
-                            pauseMenuButtons[i].selected = false;
-                            pauseMenuButtons[(i+1)%pauseMenuButtons.length].selected = true;
-                            break;
-                        }
-                    }
-                }else if (e.getKeyCode() == KeyEvent.VK_UP){
-                    for (int i = pauseMenuButtons.length-1;  i>=0; i--){
-                        if (pauseMenuButtons[i].selected){
-                            pauseMenuButtons[i].selected = false;
-                            pauseMenuButtons[(i-1+pauseMenuButtons.length)%pauseMenuButtons.length].selected = true;
-                            break;
-                        }
-                    }
-                }else if (e.getKeyCode() == KeyEvent.VK_ENTER){
-                    if (pauseMenuButtons[0].selected){
-                        pause = false;
-                        resumed = true;
-                    }else if (pauseMenuButtons[1].selected){
-                        pause = false;
-                        started = false;
-                    }else if (pauseMenuButtons[2].selected){
-                        game = false;
-                        started = false;
-                        pause = false;
-                        menu = true;
-                    }
-                }else if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
-                    pause = false;
-                    updateTimerTask("GAME");
-                }
-            }else{
-                if (started && !gameover){
-                    if(updated %4 == 0){
-                        if (e.getKeyCode() == KeyEvent.VK_DOWN){
-                            user.orientation = 2;
-                            if (!world.outOfBound(user.r+1,true) && !world.grid[user.r+1][user.c].obstacle){
-                                user.r++;
-                            }
-                        }else if (e.getKeyCode() == KeyEvent.VK_UP){
-                            user.orientation = 0;
-                            if (!world.outOfBound(user.r-1,true) && !world.grid[user.r-1][user.c].obstacle){
-                                user.r--;
-                            }
-                        }else if (e.getKeyCode() == KeyEvent.VK_RIGHT){
-                            user.orientation = 1;
-                            if (!world.outOfBound(user.c+1,false) && !world.grid[user.r][user.c+1].obstacle){
-                                user.c++;
-                            }
-                        }else if (e.getKeyCode() == KeyEvent.VK_LEFT){
-                            user.orientation = 3;
-                            if (!world.outOfBound(user.c-1,false) && !world.grid[user.r][user.c-1].obstacle){
-                                user.c--;
-                            }
-                        }
-                    }
-                    if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
-                        pause = true;
-                        updateTimerTask("");
-                    }
-                }else if (gameover){
-                    if (e.getKeyCode() == KeyEvent.VK_DOWN||e.getKeyCode() == KeyEvent.VK_UP){
-                        for (Button b : gameOverMenuButtons) {
-                            b.selected = !b.selected;
-                        }
-                        updateTimerTask("");
-                    }else if (e.getKeyCode() == KeyEvent.VK_ENTER){
-                        for (int i = 0; i < gameOverMenuButtons.length; i++) {
-                            if (gameOverMenuButtons[i].selected && i == 0) {
-                                started = false;
-                                gameover = false;
-                            }
-                            else if (gameOverMenuButtons[i].selected && i == 1) {
-                                //back to menu
-                                menu = true;
-                                pause = false;
-                                game = false;
-                                started = false;
-                                gameover = false;
-                                resumed = false;
-                                updatedUser = false;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     public void checkGhostsStatus(){
         //if ghosts are in special mode, ghosts return to mid and get reset to normal mode
         //else user dies and then if user's life >= 0, reset the ghosts, else gameover
@@ -457,11 +489,17 @@ public class Displayer extends JPanel implements KeyListener
                 } catch (IOException e) {};
                 if (ghosts[i].r == user.r && ghosts[i].c == user.c) {
                     ghosts[i].dead = true;
+                    ghosts[i].timeUntilRevive = 8;
                 }
             } 
             else if (ghosts[i].r == user.r && ghosts[i].c == user.c && !user.specialMode) {
                 user.die();
+                break;
             }
+        }
+        if (user.life < 0) { 
+            Displayer.gameover = true; 
+            updateTimerTask("");
         }
     }
 
@@ -470,14 +508,14 @@ public class Displayer extends JPanel implements KeyListener
         boolean win = true;
         for (int r = 0; r < world.grid.length; r++) {
             for (int c = 0; c < world.grid[0].length; c++) {
-                if (world.grid[r][c].point)
+                if (world.grid[r][c].bigPoint/*should be point*/)
                     win = false;
             }
         }
         if (win) {
-            game = false;
-            started = false;
             gameover = true;
+            victory = true;
+            updateTimerTask("");
         }
     }
 
@@ -489,17 +527,33 @@ public class Displayer extends JPanel implements KeyListener
         }else if (world.grid[user.r][user.c].bigPoint){
             score += 50;
             world.grid[user.r][user.c].bigPoint = false;
-            specialModeTimer = new Timer(100, e -> {
-                user.specialMode = true;
-                specialModeTimer.stop();
-            });
-            specialModeTimer.start();
+            user.specialMode = true;
+            scareAllGhosts();
+            superRoundsLeft = 50;
         }
+    }
+
+    public void scareAllGhosts(){
+        for (int i = 0; i < ghosts.length; i++) 
+            ghosts[i].scaredMode = true; 
     }
 
     public void ghostUpdate(){
         for (int i = 0; i < ghosts.length; i++) 
             ghosts[i].performSimpleAgentTask(); 
+    }
+
+    public void checkUserStatus(){
+        if (superRoundsLeft >0) superRoundsLeft--;
+        else{
+            user.specialMode = false;
+            try {
+                ghostImages[0] = ImageIO.read(new File("blinky file.png"));
+                ghostImages[1] = ImageIO.read(new File("pinky file.png"));
+                ghostImages[2] = ImageIO.read(new File("inky file.png"));
+                ghostImages[3] = ImageIO.read(new File("clyde file.png"));
+            } catch(IOException e) { }
+        }
     }
 
     public void updateTimerTask(String type){
@@ -509,9 +563,10 @@ public class Displayer extends JPanel implements KeyListener
                     public void actionPerformed(ActionEvent evt) {
                         checkGhostsStatus();
                         eatPoint();
-                        if (updated % 20 == 0)
+                        if (updated % Ghost.updateRate == 0)
                             ghostUpdate();
                         checkVictory();
+                        checkUserStatus();
                         repaint();
                     }
                 });

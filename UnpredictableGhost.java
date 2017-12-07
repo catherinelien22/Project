@@ -15,31 +15,19 @@ public class UnpredictableGhost extends Ghost
     }
 
     @Override
-    public void sense(){
-        if (route.size() == 0){
-            Node end;
-            final Node start = world.grid[r][c];
-            mode = (int)(Math.random()*3);
-            if (mode%3 == 0){
-                if (super.route.size()==0){
-                    end = world.grid[target.r][target.c];
-                    route = SearchMethod.greedySearch(start, end, world);
-                    return;
-                }
-            }else if (mode % 3 == 1){
-                end = findAmbushPoint();
-                route = SearchMethod.greedySearch(start,end,world);
-                return;
-            }else{ //stupid ghost
-                end = world.grid[target.r][target.c];
-                double distance = end.getDist(start);
-                if (distance < 4)
-                    end = world.grid[1][1];
-                /*if (end.getDist(start) == 0)
-                end = world.grid[target.r][target.c];*/
-                route= SearchMethod.greedySearch(start, end, world);
-                return;
-            }
+    public Node sense(){
+        Node end;
+        final Node start = world.grid[r][c];
+        if (mode%3 == 0){
+            end = world.grid[target.r][target.c];
+        }else if (mode % 3 == 1){
+            end = findAmbushPoint();
+        }else{
+            end = findAmbushPoint();
+            double distance = end.getDist(start);
+            if (distance < 4)
+                end = world.grid[1][1];
         }
+        return SearchMethod.greedySearch(start, end, world);
     }
 }

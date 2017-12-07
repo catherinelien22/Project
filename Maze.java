@@ -249,35 +249,18 @@ public class Maze extends JPanel {
         //place specific amount of "Big Points"
         //the rest are points
         ArrayList <Node> intersections = new ArrayList<Node>();
-        for (int r = 1; r < grid.length - 1; r++ ) {
-            for (int c = 1; c < grid[0].length - 1; c++) {
-                //up, right
-                if (grid[r-1][c].obstacle == false && grid[r][c+1].obstacle == false) {
-                    intersections.add(grid[r][c]);
+        for (int r = 1; r < grid.length-1; r++ ) {
+            for (int c = 1; c < grid[0].length-1; c++) {
+                if (grid[r][c].obstacle)
                     continue;
-                }
-
-                //up, left
-                if (grid[r-1][c].obstacle == false && grid[r][c-1].obstacle == false) {
+                boolean[] surrounding = {grid[r+1][c].obstacle,grid[r][c+1].obstacle,grid[r-1][c].obstacle,grid[r][c-1].obstacle};
+                if (isTurn(surrounding))
                     intersections.add(grid[r][c]);
-                    continue;
-                }
-
-                //down left
-                if (grid[r+1][c].obstacle == false && grid[r][c-1].obstacle == false) {
-                    intersections.add(grid[r][c]);
-                    continue;                  
-                }
-
-                //down right
-                if (grid[r+1][c].obstacle == false && grid[r][c+1].obstacle == false) {
-                    intersections.add(grid[r][c]);
-                }
             }
         }
         int num = 0;
         int rand = 0;
-        while (num != 5) {
+        while (num != 10) {
             rand = (int)(Math.random() * intersections.size());
             intersections.get(rand).bigPoint = true;
             intersections.remove(rand);
