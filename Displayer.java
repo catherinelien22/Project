@@ -29,7 +29,7 @@ public class Displayer extends JPanel implements KeyListener
     Ghost[] ghosts;
     BufferedImage[] ghostImages, pacmanImages; //pacmanImages is for the different orientations of pacman
     BufferedImage wall, pointer;
-    Button[] displayMenuButtons,pauseMenuButtons;
+    Button[] displayMenuButtons,pauseMenuButtons,gameOverMenuButtons;
     Font currFont;
     FontMetrics metrics;
     int updated;
@@ -48,11 +48,14 @@ public class Displayer extends JPanel implements KeyListener
         pacmanImages = new BufferedImage[4];
         pauseMenuButtons = new Button[3];
         displayMenuButtons = new Button[2];
+        gameOverMenuButtons = new Button[2];
         displayMenuButtons[0] = new Button("Start", true);
         displayMenuButtons[1] = new Button("Quit", false);
         pauseMenuButtons[0] = new Button("Continue", true);
         pauseMenuButtons[1] = new Button("New Game", false);
         pauseMenuButtons[2] = new Button("To Menu", false);
+        gameOverMenuButtons[0] = new Button("New Game", true);
+        gameOverMenuButtons[1] = new Button("Menu", false);
         int updated = 0;
         try{
             currFont = Font.createFont(Font.TRUETYPE_FONT, new File("ARCADECLASSIC.TTF"));
@@ -211,10 +214,10 @@ public class Displayer extends JPanel implements KeyListener
                     g.fillRect(j*gridSize, i*gridSize, gridSize, gridSize);
                     if (world.grid[i][j].point){
                         g.setColor(Color.WHITE);
-                        g.fillOval(j*gridSize, i*gridSize, pointSize, pointSize);
+                        g.fillOval(j*gridSize, i, pointSize, pointSize);
                     }else if (world.grid[i][j].bigPoint){
-                        g.setColor(Color.WHITE);
-                        g.fillOval(j*gridSize, i*gridSize, bigPointSize, bigPointSize);
+                        g.setColor(Color.YELLOW);
+                        g.fillOval(j*gridSize, i, bigPointSize, bigPointSize);
                     }
                 }
             }
@@ -224,7 +227,7 @@ public class Displayer extends JPanel implements KeyListener
             g.drawImage(ghostImages[k], ghosts[k].c*gridSize, ghosts[k].r*gridSize, gridSize, gridSize, null, null); 
         }
         g.drawImage(pacmanImages[user.orientation], user.c*gridSize, user.r*gridSize, gridSize, gridSize, null, null);
-        
+
         g.drawString("SCORE", (int)(fs.getWidth() * 0.75), (int)(fs.getHeight() * 0.5));
         g.drawString(Integer.toString(score), (int)(fs.getWidth() * 0.75), (int)(fs.getHeight() * 0.75));
     }
@@ -301,7 +304,23 @@ public class Displayer extends JPanel implements KeyListener
     }
 
     public void displayGameOver(Graphics g){
-        g.drawString("GAMEOVER", 200,200);
+        final Dimension frameSize = GameRunner.frame.getContentPane().getSize();
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, (int) frameSize.getWidth(), (int) frameSize.getHeight());
+        g.setColor(Color.YELLOW);
+        drawCenteredString(g,"GAME OVER",(int)frameSize.getWidth()/2,(int)frameSize.getHeight()/5);
+        int buttonY = (int)frameSize.getHeight()/4;
+        for (int i = 0; i < gameOverMenuButtons.length; i++) {
+            g.setColor(Color.WHITE);
+            drawCenteredString(g,gameOverMenuButtons[i].name,(int)(frameSize.getWidth()/2),buttonY);
+            if(gameOverMenuButtons[i].selected){
+                int pointX = determinePointerLocation(gameOverMenuButtons[i].name,(int)(frameSize.getWidth()/2));
+                /*int pointHeight = determinePointerHeight(displayMenuButtons[i].name);*/
+                int stringHeight = metrics.getHeight();
+                g.drawImage(pointer,pointX,buttonY-stringHeight,stringHeight/2,stringHeight,null, null);
+            }
+            buttonY += (int)frameSize.getHeight()/4;
+        }
     }
 
     @Override
@@ -399,6 +418,29 @@ public class Displayer extends JPanel implements KeyListener
                         updateTimerTask("");
                     }
                 }else if (gameover){
+                    if (e.getKeyCode() == KeyEvent.VK_DOWN||e.getKeyCode() == KeyEvent.VK_UP){
+                        for (Button b : displayMenuButtons) {
+                            b.selected = !b.selected;
+                        }
+                        updateTimerTask("");
+                    }else if (e.getKeyCode() == KeyEvent.VK_ENTER){
+                        for (int i = 0; i < gameOverMenuButtons.length; i++) {
+                            if (gameOverMenuButtons[i].selected && i == 0) {
+                                started = false;
+                                gameover = false;
+                            }
+                            else if (gameOverMenuButtons[i].selected && i == 1) {
+                                //back to menu
+                                menu = true;
+                                pause = false;
+                                game = false;
+                                started = false;
+                                gameover = false;
+                                resumed = false;
+                                updatedUser = false;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -452,13 +494,13 @@ public class Displayer extends JPanel implements KeyListener
 
     public void ghostUpdate(){
         for (int i = 0; i < ghosts.length; i++) 
-          ghosts[i].performSimpleAgentTask(); 
+            ghosts[i].performSimpleAgentTask(); 
     }
 
     public void updateTimerTask(String type){
         if (type.equals("GAME")){
             updater.stop();
-            updater = new Timer(40, new ActionListener() {
+            updater = new Timer(100, new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
                         checkGhostsStatus();
                         eatPoint();
