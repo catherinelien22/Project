@@ -14,7 +14,7 @@ public class User
     
     public void die(){
         life--;
-        if ( life >=0)
+        if ( life >=0) 
             resurrect();
     }
     

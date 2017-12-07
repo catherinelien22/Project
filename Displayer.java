@@ -356,8 +356,6 @@ public class Displayer extends JPanel implements KeyListener
                 }
             }
         }
-        g.drawString("SCORE", (int)(fs.getWidth() * 0.75), (int)(fs.getHeight() * 0.5));
-        g.drawString(Integer.toString(score), (int)(fs.getWidth() * 0.75), (int)(fs.getHeight() * 0.75));
     }
 
     public void displayGame(Graphics g){
@@ -400,9 +398,11 @@ public class Displayer extends JPanel implements KeyListener
             user.c--;
         }
         g.drawImage(pacmanImages[user.orientation], user.c*gridSize, user.r*gridSize, gridSize, gridSize, null, null);
-
-        //g.drawString("SCORE", (int)(fs.getWidth() * 0.75), (int)(fs.getHeight() * 0.5));
-        //g.drawString(Integer.toString(score), (int)(fs.getWidth() * 0.75), (int)(fs.getHeight() * 0.75));
+        g.setColor(GameRunner.frame.getContentPane().getBackground());
+        g.fillRect((int)(fs.getWidth() * 0.75), (int)(fs.getHeight() * 0.5), (int)(fs.getWidth() / 2), (int)(fs.getHeight() / 2));
+        g.setColor(Color.BLACK);    
+        g.drawString("SCORE", (int)(fs.getWidth() * 0.75), (int)(fs.getHeight() * 0.5));
+        g.drawString(Integer.toString(score), (int)(fs.getWidth() * 0.75), (int)(fs.getHeight() * 0.75));
     }
 
     public String generateCode(int r, int c){
@@ -499,7 +499,8 @@ public class Displayer extends JPanel implements KeyListener
             }
         }
         if (user.life < 0) { 
-            Displayer.gameover = true; 
+            gameover = true; 
+            score = 0;
             updateTimerTask("");
         }
     }
@@ -516,6 +517,7 @@ public class Displayer extends JPanel implements KeyListener
         if (win) {
             gameover = true;
             victory = true;
+            score = 0;
             updateTimerTask("");
         }
     }
